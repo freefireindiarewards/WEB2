@@ -1,0 +1,624 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<title>User Profile</title>  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  <style>  
+/* --- 1. General Styles --- */  
+body {  
+margin: 0;  
+    font-family: Arial, sans-serif;  
+    background: #1E2230;   
+    color: #fff;  
+    overflow-x: hidden;   
+}  
+button {  
+    cursor: pointer;  
+}  
+/* --- 2. Profile Page Styles (Restored Original Design) --- */  
+.top-nav {  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    padding: 15px;  
+    background: #1E2230;   
+}  
+.top-nav i {  
+    font-size: 20px;  
+    color: #fff;  
+    cursor: pointer;  
+}  
+.top-nav-avatar {  
+    width: 30px;  
+    height: 30px;  
+    border-radius: 50%;  
+    background: #ff9f43;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    font-size: 16px;  
+    font-weight: bold;  
+    color: #1E2230;  
+}  
+.header {  
+    background: linear-gradient(90deg, #ff9f43, #feca57);  
+    padding: 20px;  
+    padding-top: 5px;  
+    margin-bottom: 20px;  
+}  
+.profile-info {  
+    display: flex;  
+    align-items: center;  
+    margin-bottom: 15px;  
+}  
+.avatar {  
+    width: 60px;  
+    height: 60px;  
+    border-radius: 50%;  
+    background: #2c2f4a;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    font-size: 30px;  
+    font-weight: bold;  
+    margin-right: 15px;  
+    color: #fff;  
+}  
+.username-details {  
+    line-height: 1.3;  
+}  
+.username-details strong {  
+    font-size: 18px;  
+    display: block;  
+}  
+.member-tag {  
+    background: #1dd1a1;  
+    color: #1E2230;  
+    font-size: 10px;  
+    padding: 2px 6px;  
+    border-radius: 4px;  
+    font-weight: bold;  
+    margin-left: 10px;  
+    vertical-align: top;  
+}  
+.web-info {  
+    background: rgba(0, 0, 0, 0.1);  
+    padding: 10px;  
+    border-radius: 8px;  
+    margin-top: 10px;  
+}  
+.web-url-label {  
+    color: #fff;  
+    font-size: 12px;  
+    font-weight: bold;  
+    margin-bottom: 5px;  
+    text-transform: uppercase;  
+}  
+.web-url-value {  
+    background: #1e2230;  
+    color: #aaa;  
+    padding: 8px;  
+    border-radius: 5px;  
+    font-size: 14px;  
+    word-break: break-all;  
+    min-height: 20px;  
+    cursor: pointer;   
+    text-decoration: underline; /* Visual cue that it's clickable */  
+}  
+.stats-container {  
+    display: flex;  
+    justify-content: space-around;  
+    text-align: center;  
+    margin-top: 15px;  
+}  
+.stat-box {  
+    background: #2c2f4a;  
+    padding: 10px;  
+    border-radius: 8px;  
+    width: 45%;  
+    display: flex;  
+    flex-direction: column;  
+    justify-content: center;  
+    align-items: center;  
+}  
+.stat-box .label {  
+    color: #aaa;  
+    font-size: 12px;  
+}  
+.stat-box .value {  
+    font-size: 20px;  
+    font-weight: bold;  
+    margin-top: 5px;  
+}  
+.alert-card {  
+    background: #4a2c2c;  
+    margin: 20px;  
+    padding: 15px;  
+    border-radius: 10px;  
+    text-align: center;  
+}  
+.alert-icon {  
+    color: #ff9f43;  
+    font-size: 24px;  
+    margin-bottom: 10px;  
+}  
+.link-btn {  
+    background: #1dd1a1;  
+    color: #1E2230;  
+    border: none;  
+    width: 100%;  
+    padding: 12px;  
+    border-radius: 8px;  
+    font-size: 16px;  
+    font-weight: bold;  
+    cursor: pointer;  
+    margin-top: 15px;  
+}  
+.menu-item {  
+    background: #2c2f4a;  
+    margin: 0 20px 10px 20px;  
+    padding: 15px;  
+    border-radius: 10px;  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    cursor: pointer;  
+}  
+.menu-item i {  
+    margin-right: 10px;  
+    color: #ff9f43;  
+}  
+.menu-item-text {  
+    flex-grow: 1;  
+    font-size: 16px;  
+}  
+.menu-item-arrow {  
+    color: #aaa;  
+}  
+.logout-btn-container {  
+    margin: 20px;  
+}  
+.logout-btn {  
+    background: #2c2f4a;  
+    color: #fff;  
+    border: none;  
+    width: 100%;  
+    padding: 15px;  
+    border-radius: 10px;  
+    font-size: 16px;  
+    cursor: pointer;  
+    text-align: left;  
+    display: flex;  
+    align-items: center;  
+}  
+/* --- 3. THEMES MODAL STYLES --- */  
+#themes-modal {  
+    position: fixed;  
+    top: 0;  
+    left: 0;  
+    width: 100%;  
+    height: 100%;  
+    background: #1f2437;  
+    z-index: 1000;  
+    display: none;  
+    overflow-y: auto;  
+}  
+.modal-header {  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    padding: 15px 15px;  
+    background: #1f2437;  
+    position: sticky;  
+    top: 0;  
+    z-index: 1010;  
+}  
+.modal-header h2 {  
+    margin: 0;  
+    font-size: 18px;  
+    font-weight: bold;  
+    letter-spacing: 0.5px;  
+}  
+.modal-close-btn {  
+    background: none;  
+    border: none;  
+    color: #fff;  
+    font-size: 28px;  
+    cursor: pointer;  
+    padding: 0 5px;  
+    opacity: 0.7;  
+}  
+.theme-list {  
+    padding: 0 10px;  
+}  
+.theme-item {  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    background: #2a304a;  
+    padding: 15px;  
+    margin-bottom: 10px;  
+    border-radius: 8px;  
+}  
+.theme-info {  
+    display: flex;  
+    align-items: center;  
+}  
+.theme-icon {  
+    font-size: 20px;  
+    color: #2ecc71;  
+    margin-right: 15px;  
+}  
+.text-content {  
+    display: flex;  
+    flex-direction: column;  
+    text-align: left;  
+}  
+.theme-name {  
+    font-size: 16px;  
+    font-weight: bold;  
+    margin-bottom: 2px;  
+}  
+.status {  
+    font-size: 12px;  
+    color: #2ecc71;  
+    display: flex;  
+    align-items: center;  
+}  
+.status::before {  
+    content: '•';  
+    font-size: 18px;  
+    line-height: 0;  
+    margin-right: 4px;  
+}  
+.use-btn {  
+    padding: 10px 20px;  
+    border-radius: 8px;  
+    border: none;  
+    background: #8e44ad;  
+    color: #fff;  
+    font-size: 14px;  
+    font-weight: bold;  
+    text-transform: uppercase;  
+    min-width: 80px;   
+    transition: background 0.3s;  
+    cursor: pointer;  
+}  
+  
+/* Style for active button */  
+.use-btn.active-theme {  
+    background: #2ecc71 !important;   
+    color: #1E2230;  
+    cursor: default;  
+    opacity: 1;  
+}  
+</style>  </head>  <body>  <div id="profile-content">  
+    <div class="top-nav">  
+        <i class="fas fa-bars"></i>  
+        <div>  
+            <i class="fas fa-search" style="margin-right: 15px;"></i>  
+            <i class="fas fa-sun" style="margin-right: 15px;"></i>  
+            <i class="fas fa-th-large" style="margin-right: 15px;"></i>  
+            <i class="fas fa-comment-dots" style="margin-right: 15px;"></i>  
+            <div class="top-nav-avatar" id="top-nav-avatar">A</div>  
+        </div>  
+    </div>  
+
+    <div class="header">  
+        <div class="profile-info">  
+            <div class="avatar" id="avatar">👤</div>  
+            <div class="username-details">  
+                <strong id="username">Loading...</strong>  
+                <span id="email" style="font-size: 14px; color: rgba(255, 255, 255, 0.8);">...</span>  
+            </div>  
+            <span class="member-tag">MEMBER</span>  
+        </div>  
+
+        <div class="web-info">  
+            <div class="web-url-label">WEB URL (CLICK TO OPEN THEME)</div>  
+            <div class="web-url-value" id="web-url-value">...</div>  
+        </div>  
+
+        <div class="stats-container">  
+            <div class="stat-box">  
+                <div class="label"><i class="fas fa-star"></i> RANK</div>  
+                <div class="value">#285</div>  
+            </div>  
+            <div class="stat-box">  
+                <div class="label"><i class="fas fa-trophy"></i> RESULTS</div>  
+                <div class="value">0</div>  
+            </div>  
+        </div>  
+    </div>  
+
+    <div class="alert-card">  
+        <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>  
+        link your telegram account before using the web  
+        <button class="link-btn">LINK</button>  
+    </div>  
+
+    <div class="menu-item">  
+        <div class="menu-item-text"><i class="fas fa-cog"></i> ACCOUNT SETTINGS</div>  
+        <div class="menu-item-arrow"><i class="fas fa-chevron-right"></i></div>  
+    </div>  
+
+    <div class="menu-item" onclick="showThemesModal()">  
+        <div class="menu-item-text"><i class="fas fa-palette"></i> THEMES & DEMOS</div>  
+        <div class="menu-item-arrow"><i class="fas fa-chevron-right"></i></div>  
+    </div>  
+
+    <div class="menu-item">  
+        <div class="menu-item-text"><i class="fas fa-user-circle"></i> PROFILE SETTINGS</div>  
+        <div class="menu-item-arrow"><i class="fas fa-chevron-right"></i></div>  
+    </div>  
+
+    <div class="logout-btn-container">  
+        <button class="logout-btn" onclick="logout()">  
+            <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>  
+            LOGOUT  
+        </button>  
+    </div>  
+</div>  
+
+
+<div id="themes-modal">  
+    <div class="modal-header">  
+        <h2>THEMES & DEMOS</h2>  
+        <button class="modal-close-btn" onclick="hideThemesModal()">&times;</button>  
+    </div>  
+
+    <div class="theme-list">  
+          
+        <div class="theme-item">  
+            <div class="theme-info">  
+                <span class="theme-icon">&#x27A4;</span>   
+                <div class="text-content">  
+                    <div class="theme-name">New Event 1 (Link A)</div>  
+                    <div class="status">ONLINE</div>  
+                </div>  
+            </div>  
+            <button class="use-btn" data-theme="event1" data-url="https://temporasms.com/buy-number" onclick="useTheme(this)">USE</button>  
+        </div>  
+
+        <div class="theme-item">  
+            <div class="theme-info">  
+                <span class="theme-icon">&#x27A4;</span>   
+                <div class="text-content">  
+                    <div class="theme-name">New Event 2 (Link B)</div>  
+                    <div class="status">ONLINE</div>  
+                </div>  
+            </div>  
+            <button class="use-btn" data-theme="event2" data-url="https://smsnum.org/numbers/" onclick="useTheme(this)">USE</button>  
+        </div>  
+
+        <div class="theme-item">  
+            <div class="theme-info">  
+                <span class="theme-icon">&#x27A4;</span>   
+                <div class="text-content">  
+                    <div class="theme-name">New Event 3 (Link C)</div>  
+                    <div class="status">ONLINE</div>  
+                </div>  
+            </div>  
+            <button class="use-btn" data-theme="event3" data-url="theme.html" onclick="useTheme(this)">USE</button>  
+        </div>  
+
+        <div class="theme-item">  
+            <div class="theme-info">  
+                <span class="theme-icon">&#x27A4;</span>   
+                <div class="text-content">  
+                    <div class="theme-name">New Event 4</div>  
+                    <div class="status">ONLINE</div>  
+                </div>  
+            </div>  
+            <button class="use-btn" data-theme="event4" data-url="https://example.com/theme4?user=[UID]" onclick="useTheme(this)">USE</button>  
+        </div>  
+          
+    </div>  
+    <div style="height: 50px;"></div>   
+</div>
+
+<script>  
+/* 🔥 FIREBASE CONFIG */  
+// NOTE: Please ensure your Firebase config keys are correct here.  
+const firebaseConfig = {  
+    apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",  
+    authDomain: "flowwebsff.firebaseapp.com",  
+    projectId: "flowwebsff"  
+};  
+  
+firebase.initializeApp(firebaseConfig);  
+const auth = firebase.auth();  
+const db = firebase.firestore();  
+  
+/* 🌐 CONSTANTS & STATE */  
+const BASE_DOMAIN = "https://flowffweb.owner/claim/";  
+let currentUserUID = "DefaultGuestID"; // Fallback ID  
+  
+/* 🛠 HELPER: UPDATE URL DISPLAY BOX */  
+function updateUrlDisplay() {  
+    const webUrlValueElement = document.getElementById('web-url-value');  
+    if (webUrlValueElement) {  
+        // Display base link (Theme logic only affects *what* opens on click, not *what* is displayed here)  
+        webUrlValueElement.innerText = BASE_DOMAIN + currentUserUID;  
+    }  
+}  
+  
+/* 🚪 LOGOUT */  
+function logout(){  
+    auth.signOut().then(()=>{  
+        // Redirect to login page after signing out  
+        window.location.href = "index.html";   
+    }).catch((error) => {  
+        alert("Logout failed: " + error.message);  
+    });  
+}  
+  
+/* 🎨 THEMES MODAL LOGIC */  
+function showThemesModal() {  
+    document.getElementById('themes-modal').style.display = 'block';  
+    document.body.style.overflow = 'hidden';   
+}  
+  
+function hideThemesModal() {  
+    document.getElementById('themes-modal').style.display = 'none';  
+    document.body.style.overflow = 'auto';   
+}  
+  
+  
+/**  
+ * 🔘 USE → Firebase me save  
+ * Sets the theme as active and saves its ID and URL template to Firestore.  
+ */  
+function useTheme(btn){  
+    const themeId = btn.getAttribute('data-theme');  
+    const customUrl = btn.getAttribute('data-url');  
+    const user = auth.currentUser;  
+      
+    if(!user) {  
+        alert("Please log in first to select a theme.");  
+        return;  
+    }  
+  
+    // 1. UI Update: Sabhi buttons ko reset karke current button ko active karein  
+    document.querySelectorAll(".use-btn").forEach(b=>{  
+        b.classList.remove("active-theme");  
+        b.innerText="USE";  
+        b.disabled = false;  
+    });  
+  
+    btn.classList.add("active-theme");  
+    btn.innerText="IN USE";  
+    btn.disabled = true;  
+  
+    // 2. Persistence: Active theme ID and URL template ko Firestore mein save karein  
+    db.collection("users").doc(user.uid).set({  
+        activeThemeId: themeId,  
+        activeThemeUrl: customUrl // Save the URL template  
+    }, { merge: true })   
+    .then(() => {  
+        console.log(`Theme '${themeId}' and URL template saved to Firestore.`);  
+    })  
+    .catch((error) => {  
+        console.error("Error saving theme:", error);  
+        alert("Failed to save theme. Check console for details.");  
+    });  
+}  
+  
+  
+/* 🚀 MAIN URL OPENER LOGIC (Triggered by clicking the Web URL box) */  
+function openWebUrl() {  
+    const user = auth.currentUser;  
+    if (!user) {  
+        alert("Please log in to open your web URL.");  
+        return;  
+    }  
+  
+    // Fetch the URL template from Firestore (or use the base link as fallback)  
+    db.collection("users").doc(user.uid).get().then(doc => {  
+        let finalUrl = BASE_DOMAIN + currentUserUID; // Default fallback URL  
+          
+        if (doc.exists && doc.data().activeThemeUrl) {  
+            const urlTemplate = doc.data().activeThemeUrl;  
+              
+            // Replace the placeholder [UID] with the actual user ID  
+            finalUrl = urlTemplate.replace(/UID/g, currentUserUID);   
+        }  
+  
+        // Open the finalized URL  
+        window.open(finalUrl, '_blank');  
+        console.log("Opened finalized URL:", finalUrl);  
+  
+    }).catch(error => {  
+        console.error("Error fetching theme URL:", error);  
+        // Fallback to base URL if Firestore fails  
+        window.open(BASE_DOMAIN + currentUserUID, '_blank');  
+    });  
+}  
+  
+  
+/**  
+ * 🔄 Page reload → Firebase se read  
+ * Handles user login and restores the saved theme state.  
+ */  
+auth.onAuthStateChanged(user=>{  
+    const userNameEl = document.getElementById("username");  
+    const userEmailEl = document.getElementById("email");  
+    const avatarEl = document.getElementById("avatar");  
+    const topNavAvatarEl = document.getElementById("top-nav-avatar");  
+  
+    if(user){  
+        currentUserUID = user.uid; // Update global UID  
+          
+        // User Info Display  
+        let name = user.displayName || user.email.split('@')[0];  
+        userNameEl.innerText = name;  
+        userEmailEl.innerText = user.email;  
+        avatarEl.innerText = name.charAt(0).toUpperCase();  
+        topNavAvatarEl.innerText = name.charAt(0).toUpperCase();  
+  
+        updateUrlDisplay(); // Update displayed URL  
+  
+        // Firestore se Saved Theme Load karein  
+        db.collection("users").doc(user.uid).get().then(doc => {  
+            if(doc.exists && doc.data().activeThemeId){  
+                const savedThemeId = doc.data().activeThemeId;  
+                  
+                // Saved theme ke anusaar button ko 'IN USE' set karein  
+                document.querySelectorAll(".use-btn").forEach(b => {  
+                    if(b.getAttribute('data-theme') === savedThemeId){  
+                        b.classList.add("active-theme");  
+                        b.innerText = "IN USE";  
+                        b.disabled = true;  
+                    } else {  
+                        // Baki buttons ko 'USE' rakhein  
+                        b.classList.remove("active-theme");  
+                        b.innerText = "USE";  
+                        b.disabled = false;  
+                    }  
+                });  
+                console.log(`Loaded saved theme ID: ${savedThemeId}`);  
+            } else {  
+                console.log("No active theme found in Firestore.");  
+                // Ensure all buttons are 'USE' if nothing saved  
+                document.querySelectorAll(".use-btn").forEach(b => {  
+                    b.classList.remove("active-theme");  
+                    b.innerText = "USE";  
+                    b.disabled = false;  
+                });  
+            }  
+        }).catch(error => {  
+            console.error("Error fetching theme:", error);  
+        });  
+  
+    } else {  
+        // Logged out state  
+        currentUserUID = "DefaultGuestID";  
+        userNameEl.innerText = "Guest User (Please Login)";  
+        userEmailEl.innerText = "N/A";  
+        avatarEl.innerText = "👤";  
+        topNavAvatarEl.innerText = "?";  
+        updateUrlDisplay();  
+          
+        // Sabhi buttons se IN USE state hatayein  
+        document.querySelectorAll(".use-btn").forEach(b => {  
+            b.classList.remove("active-theme");  
+            b.innerText = "USE";  
+            b.disabled = false;  
+        });  
+    }  
+});  
+  
+  
+/* 🚀 Event Listener for Web URL Box */  
+document.addEventListener("DOMContentLoaded", () => {  
+    const webUrlValueElement = document.getElementById('web-url-value');  
+    if (webUrlValueElement) {  
+        // Attach the function to open the URL when the Web URL box is clicked  
+        webUrlValueElement.addEventListener('click', openWebUrl);  
+    }  
+    // Initial display update (will be overwritten by auth.onAuthStateChanged)  
+    updateUrlDisplay();   
+});  
+</script>  
+</body>  
+</html>
