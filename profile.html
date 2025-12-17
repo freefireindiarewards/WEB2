@@ -15,7 +15,7 @@ margin: 0;
 button {  
     cursor: pointer;  
 }  
-/* --- 2. Profile Page Styles (Restored Original Design) --- */  
+/* --- 2. Profile Page Styles --- */  
 .top-nav {  
     display: flex;  
     justify-content: space-between;  
@@ -103,7 +103,8 @@ button {
     word-break: break-all;  
     min-height: 20px;  
     cursor: pointer;   
-    text-decoration: underline; /* Visual cue that it's clickable */  
+    text-decoration: none; /* Underline removed as it's not a clickable link now */  
+    border: 1px dashed #555; /* Visual cue for copying */
 }  
 .stats-container {  
     display: flex;  
@@ -285,7 +286,6 @@ button {
     cursor: pointer;  
 }  
   
-/* Style for active button */  
 .use-btn.active-theme {  
     background: #2ecc71 !important;   
     color: #1E2230;  
@@ -315,7 +315,7 @@ button {
         </div>  
 
         <div class="web-info">  
-            <div class="web-url-label">WEB URL (CLICK TO OPEN THEME)</div>  
+            <div class="web-url-label">YOUR WEB URL (CLICK TO COPY)</div>  
             <div class="web-url-value" id="web-url-value">...</div>  
         </div>  
 
@@ -419,7 +419,6 @@ button {
 
 <script>  
 /* 🔥 FIREBASE CONFIG */  
-// NOTE: Please ensure your Firebase config keys are correct here.  
 const firebaseConfig = {  
     apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",  
     authDomain: "flowwebsff.firebaseapp.com",  
@@ -432,21 +431,31 @@ const db = firebase.firestore();
   
 /* 🌐 CONSTANTS & STATE */  
 const BASE_DOMAIN = "https://flowownerffwebomtqnew.github.io/WEB2/Claim/";  
-let currentUserUID = "DefaultGuestID"; // Fallback ID  
+let currentUserUID = "DefaultGuestID"; 
   
 /* 🛠 HELPER: UPDATE URL DISPLAY BOX */  
 function updateUrlDisplay() {  
     const webUrlValueElement = document.getElementById('web-url-value');  
     if (webUrlValueElement) {  
-        // Display base link (Theme logic only affects *what* opens on click, not *what* is displayed here)  
         webUrlValueElement.innerText = BASE_DOMAIN + currentUserUID;  
     }  
 }  
+
+/* 📋 COPY FUNCTION: Ab Click par Copy hoga, Open nahi */
+function copyUrlToClipboard() {
+    const textToCopy = document.getElementById('web-url-value').innerText;
+    if (textToCopy === "..." || textToCopy === "") return;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Link Copied! Ab aap ise browser me paste karke open kar sakte hain.");
+    }).catch(err => {
+        console.error('Copy failed: ', err);
+    });
+}
   
 /* 🚪 LOGOUT */  
 function logout(){  
     auth.signOut().then(()=>{  
-        // Redirect to login page after signing out  
         window.location.href = "index.html";   
     }).catch((error) => {  
         alert("Logout failed: " + error.message);  
@@ -464,11 +473,7 @@ function hideThemesModal() {
     document.body.style.overflow = 'auto';   
 }  
   
-  
-/**  
- * 🔘 USE → Firebase me save  
- * Sets the theme as active and saves its ID and URL template to Firestore.  
- */  
+/* 🔘 USE → Firebase me save */  
 function useTheme(btn){  
     const themeId = btn.getAttribute('data-theme');  
     const customUrl = btn.getAttribute('data-url');  
@@ -479,7 +484,6 @@ function useTheme(btn){
         return;  
     }  
   
-    // 1. UI Update: Sabhi buttons ko reset karke current button ko active karein  
     document.querySelectorAll(".use-btn").forEach(b=>{  
         b.classList.remove("active-theme");  
         b.innerText="USE";  
@@ -490,56 +494,19 @@ function useTheme(btn){
     btn.innerText="IN USE";  
     btn.disabled = true;  
   
-    // 2. Persistence: Active theme ID and URL template ko Firestore mein save karein  
     db.collection("users").doc(user.uid).set({  
         activeThemeId: themeId,  
-        activeThemeUrl: customUrl // Save the URL template  
+        activeThemeUrl: customUrl 
     }, { merge: true })   
     .then(() => {  
-        console.log(`Theme '${themeId}' and URL template saved to Firestore.`);  
+        console.log(`Theme '${themeId}' saved.`);  
     })  
     .catch((error) => {  
         console.error("Error saving theme:", error);  
-        alert("Failed to save theme. Check console for details.");  
     });  
 }  
   
-  
-/* 🚀 MAIN URL OPENER LOGIC (Triggered by clicking the Web URL box) */  
-function openWebUrl() {  
-    const user = auth.currentUser;  
-    if (!user) {  
-        alert("Please log in to open your web URL.");  
-        return;  
-    }  
-  
-    // Fetch the URL template from Firestore (or use the base link as fallback)  
-    db.collection("users").doc(user.uid).get().then(doc => {  
-        let finalUrl = BASE_DOMAIN + currentUserUID; // Default fallback URL  
-          
-        if (doc.exists && doc.data().activeThemeUrl) {  
-            const urlTemplate = doc.data().activeThemeUrl;  
-              
-            // Replace the placeholder [UID] with the actual user ID  
-            finalUrl = urlTemplate.replace(/UID/g, currentUserUID);   
-        }  
-  
-        // Open the finalized URL  
-        window.open(finalUrl, '_blank');  
-        console.log("Opened finalized URL:", finalUrl);  
-  
-    }).catch(error => {  
-        console.error("Error fetching theme URL:", error);  
-        // Fallback to base URL if Firestore fails  
-        window.open(BASE_DOMAIN + currentUserUID, '_blank');  
-    });  
-}  
-  
-  
-/**  
- * 🔄 Page reload → Firebase se read  
- * Handles user login and restores the saved theme state.  
- */  
+/* 🔄 Page reload → Firebase se read */  
 auth.onAuthStateChanged(user=>{  
     const userNameEl = document.getElementById("username");  
     const userEmailEl = document.getElementById("email");  
@@ -547,76 +514,40 @@ auth.onAuthStateChanged(user=>{
     const topNavAvatarEl = document.getElementById("top-nav-avatar");  
   
     if(user){  
-        currentUserUID = user.uid; // Update global UID  
+        currentUserUID = user.uid; 
           
-        // User Info Display  
         let name = user.displayName || user.email.split('@')[0];  
         userNameEl.innerText = name;  
         userEmailEl.innerText = user.email;  
         avatarEl.innerText = name.charAt(0).toUpperCase();  
         topNavAvatarEl.innerText = name.charAt(0).toUpperCase();  
   
-        updateUrlDisplay(); // Update displayed URL  
+        updateUrlDisplay(); 
   
-        // Firestore se Saved Theme Load karein  
         db.collection("users").doc(user.uid).get().then(doc => {  
             if(doc.exists && doc.data().activeThemeId){  
                 const savedThemeId = doc.data().activeThemeId;  
-                  
-                // Saved theme ke anusaar button ko 'IN USE' set karein  
                 document.querySelectorAll(".use-btn").forEach(b => {  
                     if(b.getAttribute('data-theme') === savedThemeId){  
                         b.classList.add("active-theme");  
                         b.innerText = "IN USE";  
                         b.disabled = true;  
-                    } else {  
-                        // Baki buttons ko 'USE' rakhein  
-                        b.classList.remove("active-theme");  
-                        b.innerText = "USE";  
-                        b.disabled = false;  
                     }  
                 });  
-                console.log(`Loaded saved theme ID: ${savedThemeId}`);  
-            } else {  
-                console.log("No active theme found in Firestore.");  
-                // Ensure all buttons are 'USE' if nothing saved  
-                document.querySelectorAll(".use-btn").forEach(b => {  
-                    b.classList.remove("active-theme");  
-                    b.innerText = "USE";  
-                    b.disabled = false;  
-                });  
             }  
-        }).catch(error => {  
-            console.error("Error fetching theme:", error);  
         });  
-  
     } else {  
-        // Logged out state  
         currentUserUID = "DefaultGuestID";  
-        userNameEl.innerText = "Guest User (Please Login)";  
-        userEmailEl.innerText = "N/A";  
-        avatarEl.innerText = "👤";  
-        topNavAvatarEl.innerText = "?";  
         updateUrlDisplay();  
-          
-        // Sabhi buttons se IN USE state hatayein  
-        document.querySelectorAll(".use-btn").forEach(b => {  
-            b.classList.remove("active-theme");  
-            b.innerText = "USE";  
-            b.disabled = false;  
-        });  
     }  
 });  
   
-  
-/* 🚀 Event Listener for Web URL Box */  
+/* 🚀 Event Listener for Copy Action */  
 document.addEventListener("DOMContentLoaded", () => {  
     const webUrlValueElement = document.getElementById('web-url-value');  
     if (webUrlValueElement) {  
-        // Attach the function to open the URL when the Web URL box is clicked  
-        webUrlValueElement.addEventListener('click', openWebUrl);  
+        webUrlValueElement.addEventListener('click', copyUrlToClipboard);  
     }  
-    // Initial display update (will be overwritten by auth.onAuthStateChanged)  
     updateUrlDisplay();   
 });  
 </script>  
