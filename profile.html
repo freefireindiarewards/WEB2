@@ -549,7 +549,39 @@ document.addEventListener("DOMContentLoaded", () => {
         webUrlValueElement.addEventListener('click', copyUrlToClipboard);  
     }  
     updateUrlDisplay();   
-});  
+}); 
+    /* 🔁 DIRECT THEME VIEW MODE */
+const params = new URLSearchParams(window.location.search);
+const uidFromUrl = params.get("uid");
+
+if (uidFromUrl && uidFromUrl !== currentUserUID) {
+
+  document.body.innerHTML = `
+    <div style="
+      background:#1E2230;
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      font-family:Arial;
+    ">
+      <h3>🔄 Theme load ho rahi hai...</h3>
+    </div>
+  `;
+
+  db.collection("users").doc(uidFromUrl).get()
+    .then(doc => {
+      if (doc.exists && doc.data().activeThemeUrl) {
+        window.location.href = doc.data().activeThemeUrl;
+      } else {
+        document.body.innerHTML = "❌ Theme nahi mili";
+      }
+    })
+    .catch(() => {
+      document.body.innerHTML = "❌ Error aaya";
+    });
+}
 </script>  
 </body>  
 </html>
