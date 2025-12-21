@@ -103,8 +103,8 @@ button {
     word-break: break-all;  
     min-height: 20px;  
     cursor: pointer;   
-    text-decoration: none; /* Underline removed as it's not a clickable link now */  
-    border: 1px dashed #555; /* Visual cue for copying */
+    text-decoration: none;  
+    border: 1px dashed #555;  
 }  
 .stats-container {  
     display: flex;  
@@ -430,8 +430,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();  
   
 /* 🌐 CONSTANTS & STATE */  
-const BASE_DOMAIN =
-"https://flowownerffwebontg.github.io/WEB2/profile.html?uid=";
+const BASE_DOMAIN = "https://flowownerffwebontg.github.io/WEB2/profile.html?uid=";
 let currentUserUID = "DefaultGuestID"; 
   
 /* 🛠 HELPER: UPDATE URL DISPLAY BOX */  
@@ -442,13 +441,13 @@ function updateUrlDisplay() {
     }  
 }  
 
-/* 📋 COPY FUNCTION: Ab Click par Copy hoga, Open nahi */
+/* 📋 COPY FUNCTION */
 function copyUrlToClipboard() {
     const textToCopy = document.getElementById('web-url-value').innerText;
     if (textToCopy === "..." || textToCopy === "") return;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("Link Copied! Ab aap ise browser me paste karke open kar sakte hain.");
+        alert("Link Copied!");
     }).catch(err => {
         console.error('Copy failed: ', err);
     });
@@ -458,8 +457,6 @@ function copyUrlToClipboard() {
 function logout(){  
     auth.signOut().then(()=>{  
         window.location.href = "index.html";   
-    }).catch((error) => {  
-        alert("Logout failed: " + error.message);  
     });  
 }  
   
@@ -474,40 +471,43 @@ function hideThemesModal() {
     document.body.style.overflow = 'auto';   
 }  
   
-/* 🔘 USE → Firebase me save */  
+/* 🔘 USE → Firebase me pakka save karein */  
 function useTheme(btn){  
     const themeId = btn.getAttribute('data-theme');  
     const customUrl = btn.getAttribute('data-url');  
     const user = auth.currentUser;  
       
     if(!user) {  
-        alert("Please log in first to select a theme.");  
+        alert("Please log in first!");  
         return;  
     }  
   
+    // UI Update: Sabhi buttons ko reset karein
     document.querySelectorAll(".use-btn").forEach(b=>{  
         b.classList.remove("active-theme");  
         b.innerText="USE";  
         b.disabled = false;  
     });  
   
+    // Selected button ko active banayein
     btn.classList.add("active-theme");  
     btn.innerText="IN USE";  
     btn.disabled = true;  
   
+    // Database mein update karein
     db.collection("users").doc(user.uid).set({  
         activeThemeId: themeId,  
         activeThemeUrl: customUrl 
     }, { merge: true })   
     .then(() => {  
-        console.log(`Theme '${themeId}' saved.`);  
+        console.log(`Theme '${themeId}' permanently saved.`);  
     })  
     .catch((error) => {  
         console.error("Error saving theme:", error);  
     });  
 }  
   
-/* 🔄 Page reload → Firebase se read */  
+/* 🔄 Persistence Logic: Page reload ya Login ke baad check karna */  
 auth.onAuthStateChanged(user=>{  
     const userNameEl = document.getElementById("username");  
     const userEmailEl = document.getElementById("email");  
@@ -516,6 +516,7 @@ auth.onAuthStateChanged(user=>{
   
     if(user){  
         currentUserUID = user.uid; 
+        updateUrlDisplay(); 
           
         let name = user.displayName || user.email.split('@')[0];  
         userNameEl.innerText = name;  
@@ -523,8 +524,7 @@ auth.onAuthStateChanged(user=>{
         avatarEl.innerText = name.charAt(0).toUpperCase();  
         topNavAvatarEl.innerText = name.charAt(0).toUpperCase();  
   
-        updateUrlDisplay(); 
-  
+        // 🛠️ Database se saved data fetch karke UI update karna
         db.collection("users").doc(user.uid).get().then(doc => {  
             if(doc.exists && doc.data().activeThemeId){  
                 const savedThemeId = doc.data().activeThemeId;  
@@ -533,7 +533,12 @@ auth.onAuthStateChanged(user=>{
                         b.classList.add("active-theme");  
                         b.innerText = "IN USE";  
                         b.disabled = true;  
-                    }  
+                    } else {
+                        // Baki sabko reset rakhein
+                        b.classList.remove("active-theme");
+                        b.innerText = "USE";
+                        b.disabled = false;
+                    }
                 });  
             }  
         });  
@@ -543,44 +548,22 @@ auth.onAuthStateChanged(user=>{
     }  
 });  
   
-/* 🚀 Event Listener for Copy Action */  
 document.addEventListener("DOMContentLoaded", () => {  
     const webUrlValueElement = document.getElementById('web-url-value');  
     if (webUrlValueElement) {  
         webUrlValueElement.addEventListener('click', copyUrlToClipboard);  
     }  
-    updateUrlDisplay();   
 }); 
-    /* 🔁 DIRECT THEME VIEW MODE */
+
+/* 🔁 REDIRECT MODE */
 const params = new URLSearchParams(window.location.search);
 const uidFromUrl = params.get("uid");
 
-if (uidFromUrl && uidFromUrl !== currentUserUID) {
-
-  document.body.innerHTML = `
-    <div style="
-      background:#1E2230;
-      color:white;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      font-family:Arial;
-    ">
-      <h3>🔄 Theme load ho rahi hai...</h3>
-    </div>
-  `;
-
-  db.collection("users").doc(uidFromUrl).get()
-    .then(doc => {
-      if (doc.exists && doc.data().activeThemeUrl) {
-        window.location.href = doc.data().activeThemeUrl;
-      } else {
-        document.body.innerHTML = "❌ Theme nahi mili";
-      }
-    })
-    .catch(() => {
-      document.body.innerHTML = "❌ Error aaya";
+if (uidFromUrl) {
+    db.collection("users").doc(uidFromUrl).get().then(doc => {
+        if (doc.exists && doc.data().activeThemeUrl) {
+            window.location.href = doc.data().activeThemeUrl;
+        }
     });
 }
 </script>  
