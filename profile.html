@@ -103,8 +103,8 @@ button {
     word-break: break-all;  
     min-height: 20px;  
     cursor: pointer;   
-    text-decoration: none; /* Underline removed as it's not a clickable link now */  
-    border: 1px dashed #555; /* Visual cue for copying */
+    text-decoration: none;  
+    border: 1px dashed #555;  
 }  
 .stats-container {  
     display: flex;  
@@ -368,7 +368,6 @@ button {
     </div>  
 
     <div class="theme-list">  
-          
         <div class="theme-item">  
             <div class="theme-info">  
                 <span class="theme-icon">&#x27A4;</span>   
@@ -379,7 +378,6 @@ button {
             </div>  
             <button class="use-btn" data-theme="event1" data-url="https://temporasms.com/buy-number" onclick="useTheme(this)">USE</button>  
         </div>  
-
         <div class="theme-item">  
             <div class="theme-info">  
                 <span class="theme-icon">&#x27A4;</span>   
@@ -390,7 +388,6 @@ button {
             </div>  
             <button class="use-btn" data-theme="event2" data-url="https://smsnum.org/numbers/" onclick="useTheme(this)">USE</button>  
         </div>  
-
         <div class="theme-item">  
             <div class="theme-info">  
                 <span class="theme-icon">&#x27A4;</span>   
@@ -401,7 +398,6 @@ button {
             </div>  
             <button class="use-btn" data-theme="event3" data-url="theme.html" onclick="useTheme(this)">USE</button>  
         </div>  
-
         <div class="theme-item">  
             <div class="theme-info">  
                 <span class="theme-icon">&#x27A4;</span>   
@@ -412,7 +408,6 @@ button {
             </div>  
             <button class="use-btn" data-theme="event4" data-url="https://example.com/theme4?user=[UID]" onclick="useTheme(this)">USE</button>  
         </div>  
-          
     </div>  
     <div style="height: 50px;"></div>   
 </div>
@@ -429,43 +424,31 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();  
 const db = firebase.firestore();  
 
-// ✅ ADDED: Permanent login logic (Don't logout automatically)
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-  
-/* 🌐 CONSTANTS & STATE */  
+// ✅ FIXED: Force Persistent Session (ID logout nahi hogi)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => { console.log("Session Locked"); })
+  .catch((err) => { console.error(err); });
+
 const BASE_DOMAIN = "https://flowownerffwebontg.github.io/WEB2/profile.html?uid=";
 let currentUserUID = "DefaultGuestID"; 
   
-/* 🛠 HELPER: UPDATE URL DISPLAY BOX */  
 function updateUrlDisplay() {  
     const webUrlValueElement = document.getElementById('web-url-value');  
-    if (webUrlValueElement) {  
-        webUrlValueElement.innerText = BASE_DOMAIN + currentUserUID;  
-    }  
+    if (webUrlValueElement) webUrlValueElement.innerText = BASE_DOMAIN + currentUserUID;  
 }  
 
-/* 📋 COPY FUNCTION: Ab Click par Copy hoga, Open nahi */
 function copyUrlToClipboard() {
     const textToCopy = document.getElementById('web-url-value').innerText;
     if (textToCopy === "..." || textToCopy === "") return;
-
     navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("Link Copied! Ab aap ise browser me paste karke open kar sakte hain.");
-    }).catch(err => {
-        console.error('Copy failed: ', err);
+        alert("Link Copied!");
     });
 }
   
-/* 🚪 LOGOUT */  
 function logout(){  
-    auth.signOut().then(()=>{  
-        window.location.href = "index.html";   
-    }).catch((error) => {  
-        alert("Logout failed: " + error.message);  
-    });  
+    auth.signOut().then(()=>{ window.location.href = "index.html"; });  
 }  
   
-/* 🎨 THEMES MODAL LOGIC */  
 function showThemesModal() {  
     document.getElementById('themes-modal').style.display = 'block';  
     document.body.style.overflow = 'hidden';   
@@ -476,16 +459,12 @@ function hideThemesModal() {
     document.body.style.overflow = 'auto';   
 }  
   
-/* 🔘 USE → Firebase me save */  
 function useTheme(btn){  
     const themeId = btn.getAttribute('data-theme');  
     const customUrl = btn.getAttribute('data-url');  
     const user = auth.currentUser;  
       
-    if(!user) {  
-        alert("Please log in first to select a theme.");  
-        return;  
-    }  
+    if(!user) return;  
   
     document.querySelectorAll(".use-btn").forEach(b=>{  
         b.classList.remove("active-theme");  
@@ -500,16 +479,9 @@ function useTheme(btn){
     db.collection("users").doc(user.uid).set({  
         activeThemeId: themeId,  
         activeThemeUrl: customUrl 
-    }, { merge: true })   
-    .then(() => {  
-        console.log(`Theme '${themeId}' saved.`);  
-    })  
-    .catch((error) => {  
-        console.error("Error saving theme:", error);  
-    });  
+    }, { merge: true });
 }  
   
-/* 🔄 Page reload → Firebase se read */  
 auth.onAuthStateChanged(user=>{  
     const userNameEl = document.getElementById("username");  
     const userEmailEl = document.getElementById("email");  
@@ -518,7 +490,6 @@ auth.onAuthStateChanged(user=>{
   
     if(user){  
         currentUserUID = user.uid; 
-          
         let name = user.displayName || user.email.split('@')[0];  
         userNameEl.innerText = name;  
         userEmailEl.innerText = user.email;  
@@ -527,7 +498,7 @@ auth.onAuthStateChanged(user=>{
   
         updateUrlDisplay(); 
   
-        // ✅ FIXED: Har baar login par theme check karega
+        // Restore Theme State from DB
         db.collection("users").doc(user.uid).get().then(doc => {  
             if(doc.exists && doc.data().activeThemeId){  
                 const savedThemeId = doc.data().activeThemeId;  
@@ -537,7 +508,6 @@ auth.onAuthStateChanged(user=>{
                         b.innerText = "IN USE";  
                         b.disabled = true;  
                     } else {
-                        // Reset other buttons
                         b.classList.remove("active-theme");
                         b.innerText = "USE";
                         b.disabled = false;
@@ -551,33 +521,21 @@ auth.onAuthStateChanged(user=>{
     }  
 });  
   
-/* 🚀 Event Listener for Copy Action */  
 document.addEventListener("DOMContentLoaded", () => {  
     const webUrlValueElement = document.getElementById('web-url-value');  
-    if (webUrlValueElement) {  
-        webUrlValueElement.addEventListener('click', copyUrlToClipboard);  
-    }  
+    if (webUrlValueElement) webUrlValueElement.addEventListener('click', copyUrlToClipboard);  
     updateUrlDisplay();   
 }); 
 
-/* 🔁 DIRECT THEME VIEW MODE */
 const params = new URLSearchParams(window.location.search);
 const uidFromUrl = params.get("uid");
-
 if (uidFromUrl && uidFromUrl !== currentUserUID) {
-  document.body.innerHTML = `<div style="background:#1E2230;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial;"><h3>🔄 Theme load ho rahi hai...</h3></div>`;
-  db.collection("users").doc(uidFromUrl).get()
-    .then(doc => {
+  db.collection("users").doc(uidFromUrl).get().then(doc => {
       if (doc.exists && doc.data().activeThemeUrl) {
         window.location.href = doc.data().activeThemeUrl;
-      } else {
-        document.body.innerHTML = "❌ Theme nahi mili";
       }
-    })
-    .catch(() => {
-      document.body.innerHTML = "❌ Error aaya";
-    });
+  });
 }
 </script>  
 </body>  
-</html>
+                    </html>
