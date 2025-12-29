@@ -261,7 +261,7 @@ body{background:#f4f5f7;font-size:14px}
   color:#444;
   padding:8px;
   border-radius:15px;
-  font-size:5px;
+  font-size:12px;
   word-break:break-all;
   cursor:pointer;
   border:4px dashed #bbb;
@@ -277,77 +277,104 @@ body{background:#f4f5f7;font-size:14px}
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
+  // ✅ Firebase init
   const firebaseConfig = {
     apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
     authDomain: "flowwebsff.firebaseapp.com",
     projectId: "flowwebsff",
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  // 🔍 UID get from URL
-  const params = new URLSearchParams(window.location.search);
-  const uid = params.get("uid");
-
-  if(uid){
-    db.collection("users").doc(uid).get().then(doc=>{
-      if(doc.exists && doc.data().themeLink){
-        // 🚀 AUTO REDIRECT
-        window.location.href = doc.data().themeLink;
-      }else{
-        document.body.innerHTML = "<h2>No active theme found</h2>";
-      }
-    });
-  }else{
-    document.body.innerHTML = "<h2>Invalid link</h2>";
+  if(!firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
   }
-  firebase.initializeApp(firebaseConfig);
+
   const db = firebase.firestore();
   const auth = firebase.auth();
+  let currentUser = null;
 
-  // Check login
-  auth.onAuthStateChanged(user => {
-  if(user){
+  // 🔐 User detect
+  auth.onAuthStateChanged(user=>{
+      if(!user) return window.location.href="index.html";
+      currentUser = user;
 
-    // ✅ Username fix
-    const username = user.displayName || user.email.split("@")[0];
+      // Username + avatar
+      const username = user.displayName || user.email.split("@")[0];
+      document.querySelector(".info h3").textContent = username;
+      document.querySelector(".info p").textContent = user.email;
 
-    // ✅ Show username & email
-    document.querySelector(".info h3").textContent = username;
-    document.querySelector(".info p").textContent = user.email;
+      const avatar = document.querySelector(".avatar");
+      avatar.textContent = username.charAt(0).toUpperCase();
 
-    // ✅ AVATAR FIRST LETTER (YAHI LINE TUM POOCHH RAHE THE)
-    const avatar = document.querySelector(".avatar");
-    avatar.textContent = username.charAt(0).toUpperCase();
+      if(user.photoURL){
+        avatar.style.backgroundImage = `url(${user.photoURL})`;
+        avatar.style.backgroundSize = "cover";
+        avatar.style.backgroundPosition = "center";
+        avatar.textContent = "";
+      }
 
-    // ✅ Agar profile photo ho to letter hata do
-    if(user.photoURL){
-      avatar.style.backgroundImage = `url(${user.photoURL})`;
-      avatar.style.backgroundSize = "cover";
-      avatar.style.backgroundPosition = "center";
-      avatar.textContent = "";
-    }
-     // ✅ YAHI ADD KARNA HAI
-    const BASE_DOMAIN = "https://freefireindiarewards.github.io/WEB2/profile.html?uid=";
-    document.getElementById("userUrl").textContent =
-      BASE_DOMAIN + user.uid;
-  }else{
-    window.location.href = "index.html";
-  }
-});
+      // Show user profile URL
+      const BASE_DOMAIN = "https://freefireindiarewards.github.io/WEB2/profile.html?uid=";
+      document.getElementById("userUrl").textContent = BASE_DOMAIN + user.uid;
+
+      // Load saved theme
+      db.collection("users").doc(user.uid).get().then(doc=>{
+        if(doc.exists && doc.data().activeTheme){
+          setThemeUI(doc.data().activeTheme);
+        }
+      });
+  });
 
   // Logout function
   function logout(){
-    auth.signOut().then(() => window.location.href="index.html");
+      auth.signOut().then(() => window.location.href="index.html");
+  }
+
+  // Copy URL
+  function copyUrl(){
+      const text = document.getElementById("userUrl").innerText;
+      if(!text || text==="Loading...") return;
+      navigator.clipboard.writeText(text);
+  }
+
+  // Open/Close themes
+  function openThemes(){ document.getElementById("themesModal").style.display="flex"; }
+  function closeThemes(){ document.getElementById("themesModal").style.display="none"; }
+
+  // Theme UI
+  function setThemeUI(themeName){
+      document.querySelectorAll(".theme-item button").forEach(btn=>{
+        btn.textContent = "USE";
+        btn.style.background = "#6c63ff";
+      });
+
+      const activeBtn = document.querySelector(`.theme-item button[data-theme="${themeName}"]`);
+      if(activeBtn){
+        activeBtn.textContent = "IN USE";
+        activeBtn.style.background = "#2ecc71";
+      }
+  }
+
+  // Apply theme
+  function applyTheme(themeName){
+      if(!currentUser) return;
+
+      const btn = document.querySelector(`.theme-item button[data-theme="${themeName}"]`);
+      const themeLink = btn.getAttribute("data-link");
+
+      db.collection("users").doc(currentUser.uid).set({
+        activeTheme: themeName,
+        themeLink: themeLink
+      }, { merge:true }).then(()=>{
+        setThemeUI(themeName);
+      });
   }
 </script>
 </head>
 
 <body>
-
 <div class="header"></div>
 
 <div class="card">
@@ -362,9 +389,7 @@ body{background:#f4f5f7;font-size:14px}
 
  <div class="url-box">
   <div class="web-url-label">YOUR WEB URL (CLICK TO COPY)</div>
-  <div class="web-url-value" id="userUrl" onclick="copyUrl()">
-    Loading...
-  </div>
+  <div class="web-url-value" id="userUrl" onclick="copyUrl()">Loading...</div>
 </div>
 
   <div class="stats">
@@ -385,12 +410,9 @@ body{background:#f4f5f7;font-size:14px}
   </div>
 
   <div class="menu-btn" onclick="openThemes()">
-  <div class="left">
-    <i class="fas fa-palette"></i>
-    <span>𝙏𝙃𝙀𝙈𝙀𝙎 & 𝘿𝙀𝙈𝙊𝙎</span>
+    <div class="left"><i class="fas fa-palette"></i><span>𝙏𝙃𝙀𝙈𝙀𝙎 & 𝘿𝙀𝙈𝙊𝙎</span></div>
+    <div class="click"><i class="fas fa-arrow-right"></i></div>
   </div>
-  <div class="click"><i class="fas fa-arrow-right"></i></div>
-</div>
 
   <div class="menu-btn">
     <div class="left"><i class="fas fa-user"></i><span>𝙋𝙍𝙊𝙁𝙄𝙇𝙀 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
@@ -399,179 +421,39 @@ body{background:#f4f5f7;font-size:14px}
 </div>
 
 <button id="logout" onclick="logout()">Logout</button>
+
 <div id="themesModal" class="themes-modal">
   <div class="themes-box">
-    
     <div class="themes-header">
       <h3><i class="fas fa-palette"></i> THEMES & DEMOS</h3>
       <span onclick="closeThemes()">✕</span>
     </div>
 
+    <!-- Theme Items -->
     <div class="theme-item">
       <div class="left">
         <div class="icon"><i class="fas fa-external-link-alt"></i></div>
-        <div>
-          <h4>ALL GUNS 2</h4>
-          <small>💎 ONLINE</small>
-        </div>
+        <div><h4>ALL GUNS 2</h4><small>💎 ONLINE</small></div>
       </div>
-      <button 
-  data-theme="ALL GUNS 2"
-  data-link="https://smsnum.org/numbers/allguns2"
-  onclick="applyTheme('ALL GUNS 2')">
-  USE
-</button>
+      <button data-theme="ALL GUNS 2" data-link="https://smsnum.org/numbers/allguns2" onclick="applyTheme('ALL GUNS 2')">USE</button>
     </div>
 
     <div class="theme-item">
       <div class="left">
         <div class="icon"><i class="fas fa-external-link-alt"></i></div>
-        <div>
-          <h4>MIX 2</h4>
-          <small>💎 ONLINE</small>
-        </div>
+        <div><h4>MIX 2</h4><small>💎 ONLINE</small></div>
       </div>
-          <button 
-  data-theme="MIX 2"
-  data-link="https://smsnum.org/numbers//MIX 2"
-  onclick="applyTheme('MIX 2')">
-  USE
-</button>
+      <button data-theme="MIX 2" data-link="https://smsnum.org/numbers//MIX 2" onclick="applyTheme('MIX 2')">USE</button>
     </div>
 
     <div class="theme-item">
       <div class="left">
         <div class="icon"><i class="fas fa-external-link-alt"></i></div>
-        <div>
-          <h4>COIN EXCHANGE 3</h4>
-          <small>💎 ONLINE</small>
-        </div>
+        <div><h4>COIN EXCHANGE 3</h4><small>💎 ONLINE</small></div>
       </div>
-      <button 
-  data-theme="COIN EXCHANGE 3"
-  data-link="https://example.com/allguns2"
-  onclick="applyTheme('COIN EXCHANGE 3')">
-  USE
-</button>
+      <button data-theme="COIN EXCHANGE 3" data-link="https://example.com/allguns2" onclick="applyTheme('COIN EXCHANGE 3')">USE</button>
     </div>
-
-    <div class="theme-item">
-      <div class="left">
-        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
-       
-        <div>
-          <h4>ALL GUNS 2000</h4>
-          <small>💎 ONLINE</small>
-        </div>
-      </div>
-      <button 
-  data-theme="ALL GUNS 2000"
-  data-link="https://example.com/allguns2"
-  onclick="applyTheme('ALL GUNS 2000')">
-  USE
-</button>
-    </div>
-
-    <div class="theme-item">
-      <div class="left">
-        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
-       
-        <div>
-          <h4>NARUTO UID</h4>
-          <small>💎 ONLINE</small>
-        </div>
-      </div>
-      <button 
-  data-theme="NARUTO UID"
-  data-link="https://example.com/allguns2"
-  onclick="applyTheme('NARUTO UID')">
-  USE
-</button>
-    </div>
-
   </div>
 </div>
-<script>
-function copyUrl(){
-  const text = document.getElementById("userUrl").innerText;
-  if(!text || text==="Loading...") return;
-
-  navigator.clipboard.writeText(text).then(()=>{
-    
-  });
-}
-</script>
 </body>
 </html>
-<script>
-function openThemes(){
-  document.getElementById("themesModal").style.display="flex";
-}
-
-function closeThemes(){
-  document.getElementById("themesModal").style.display="none";
-}
-</script>
-<script>
-let currentUser = null;
-
-// 🔐 User detect
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user;
-
-    // 🔁 Page reload ke baad saved theme load
-    db.collection("users").doc(user.uid).get().then(doc=>{
-      if(doc.exists && doc.data().activeTheme){
-        setThemeUI(doc.data().activeTheme);
-      }
-    });
-  }
-});
-
-// 🟢 UI update (sirf ek IN USE)
-function setThemeUI(themeName){
-  document.querySelectorAll(".theme-item button").forEach(btn=>{
-    btn.textContent = "USE";
-    btn.style.background = "#6c63ff";
-  });
-
-  const activeBtn = document.querySelector(
-    `.theme-item button[data-theme="${themeName}"]`
-  );
-
-  if(activeBtn){
-    activeBtn.textContent = "IN USE";
-    activeBtn.style.background = "#2ecc71";
-  }
-}
-</script>
-<script>
-function applyTheme(themeName){
-  if(!currentUser) return;
-
-  const btn = document.querySelector(
-    `.theme-item button[data-theme="${themeName}"]`
-  );
-
-  const themeLink = btn.getAttribute("data-link");
-
-  db.collection("users").doc(currentUser.uid).set({
-    activeTheme: themeName,
-    themeLink: themeLink
-  }, { merge:true }).then(()=>{
-    setThemeUI(themeName);
-  });
-}
-</script>
-<script>
-auth.onAuthStateChanged(user=>{
-  if(!user) return;
-
-  db.collection("users").doc(user.uid).get().then(doc=>{
-    if(doc.exists){
-      console.log("THEME LINK:", doc.data().themeLink);
-    }
-  });
-});
-</script>
