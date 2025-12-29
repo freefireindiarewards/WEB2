@@ -8,15 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif}
-body{background:#f4f5f7;font-size:14px;color:#333}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
+body{background:#f4f5f7;font-size:14px}
 
-/* Top bar style from 1st code */
+/* top bar */
 .topbar{
   background:#fff;
   padding:10px 12px;
@@ -26,421 +22,557 @@ body{background:#f4f5f7;font-size:14px;color:#333}
   box-shadow:0 1px 6px rgba(0,0,0,.08)
 }
 
-/* Gradient Header */
-.header-bg{
-  height:85px;
+/* gradient */
+.header{
+  height:78px;
   background:linear-gradient(90deg,#f6a623,#ffe600);
-  border-radius:0 0 20px 20px;
+  border-radius:10 10 16px 16px
 }
 
-/* Card layout from 1st code */
+/* card */
 .card{
   background:#fff;
-  margin:-45px 12px 10px;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,.1);
-  position: relative;
+  margin:-36px 12px 10px;
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1)
 }
 
+/* profile */
 .profile{
   display:flex;
   align-items:center;
   gap:12px
 }
 .avatar{
-  width:55px;height:55px;
-  border-radius:50%;
+  width:50px;height:50px;
+  border-radius:100%;
   background:#ffe5bf;
   display:flex;
   align-items:center;
   justify-content:center;
   font-weight:600;
   position:relative;
-  font-size:20px;
-  color: #d38100;
+  font-size:18px;
 }
 .avatar::after{
   content:'';
-  width:10px;height:10px;
+  width:8px;height:8px;
   background:#2ecc71;
   border-radius:50%;
   position:absolute;
   bottom:3px;right:3px;
   border:2px solid #fff
 }
-.info h3{font-size:16px; font-weight: 600;}
-.info p{font-size:12px;color:#777}
+.info h3{font-size:15px}
+.info p{font-size:12px;color:#666}
 .badge{
   margin-left:auto;
   font-size:11px;
-  padding:3px 10px;
+  padding:3px 8px;
   border-radius:20px;
   background:#e9f7ef;
-  color:#27ae60;
-  font-weight: 600;
+  color:#27ae60
 }
 
-/* URL Box - Design from 1st code */
-.url-box{margin-top:15px}
-.web-url-label{
-  font-size:11px;
-  font-weight:600;
-  color:#888;
-  margin-bottom:6px;
-  text-transform:uppercase;
+/* url */
+.url-box{margin-top:10px}
+.url-box label{font-size:11px;color:#888}
+.url{
+  background:#f2f3f5;
+  padding:15px;
+  border-radius:8px;
+  margin-top:4px;
+  font-size:12px;
+  border:5px solid #ddd
 }
-.web-url-value{
-  background:#f8f9fa;
-  color:#444;
-  padding:12px;
-  border-radius:12px;
-  font-size:11px;
-  word-break:break-all;
-  cursor:pointer;
-  border:2px dashed #ccc;
-  transition:.2s;
-  text-align: center;
-}
-.web-url-value:active{ transform:scale(.98); background:#eee; }
 
-/* Stats Grid */
+/* stats */
 .stats{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:15px
+  gap:10px;
+  margin-top:10px
 }
 .stat{
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #eee;
+  padding:10px;
+  border-radius:10px;
+  border:5px solid #e3e3e3;
   text-align:center;
   background:#fff
 }
-.stat small{font-size:11px;color:#999;font-weight:600}
-.stat h2{font-size:18px;margin-top:4px;color:#333}
+.stat small{font-size:11px;color:#888}
+.stat h2{font-size:18px;margin-top:4px}
 
-/* Alert Section */
+/* telegram */
 .alert{
-  margin:15px 12px;
-  padding:15px;
+  margin:10px 12px;
+  padding:12px;
   background:#fff2dc;
-  border-radius:14px;
-  border:1px solid #ffd59a;
+  border-radius:12px;
+  border:5px solid #ffd59a;
   text-align:center
 }
-.alert p{font-size:12px;color:#c87c00;margin-bottom:10px;font-weight:500}
+.alert p{font-size:13px;color:#c87c00;margin-bottom:8px}
 .alert button{
   width:100%;
-  padding:12px;
-  border:none;
+  padding:11px;
+  border:10;
   border-radius:10px;
   background:#2ecc71;
   color:#fff;
   font-weight:600;
   font-size:14px;
-  box-shadow:0 4px 12px rgba(46,204,113,0.3)
+  box-shadow:0 5px 14px rgba(46,204,113,.45)
 }
 
-/* Menu items */
+/* menu */
 .menu{margin:10px 12px}
 .menu-btn{
-  padding:16px;
-  border-radius:14px;
+  padding:14px;
+  border-radius:12px;
   background:#fff;
-  border:1px solid #f0f0f0;
+  border:1px solid #e6e6e6;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.04);
-  cursor: pointer;
+  margin-bottom:10px;
+  box-shadow:0 5px 14px rgba(0,0,0,.08)
 }
-.menu-btn .left{ display:flex; align-items:center; gap:12px }
-.menu-btn .left i{ color: #f6a623; font-size: 18px; }
-.menu-btn span{font-size:14px; font-weight: 500;}
-.arrow-icon{ color:#ccc; font-size:14px }
+.menu-btn .left{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+.menu-btn span{font-size:15px}
+.arrow{
+  width:30px;height:30px;
+  background:#6c63ff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:15px
+}
 
-/* Logout */
-#logout-btn{
-  margin:10px 12px 30px;
-  padding:14px;
-  background:#fff;
-  color:#e74c3c;
-  border:1px solid #ffeaea;
-  border-radius:14px;
+/* logout button */
+#logout{
+  margin:5px 12px;
+  padding:10px;
+  background:#e74c3c;
+  color:#fff;
+  border:none;
+  border-radius:80px;
   font-weight:600;
-  width: calc(100% - 24px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  cursor:pointer;
 }
-
-/* THEMES MODAL - Design from 1st code */
+/* THEMES MODAL */
 .themes-modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.35);
   display:none;
   justify-content:center;
   align-items:flex-end;
-  z-index:9999;
+  z-index:999;
 }
+
 .themes-box{
   background:#fff;
   width:100%;
-  max-height:80vh;
-  border-radius:24px 24px 0 0;
-  padding:20px;
+  max-height:85%;
+  border-radius:20px 20px 0 0;
+  padding:10px;
   overflow-y:auto;
-  animation: slideUp 0.3s ease-out;
 }
-@keyframes slideUp { from {transform: translateY(100%)} to {transform: translateY(0)} }
 
 .themes-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  margin-bottom:12px;
 }
+
+.themes-header h3{
+  font-size:16px;
+  font-weight:600;
+}
+
+.themes-header span{
+  font-size:20px;
+  cursor:pointer;
+}
+
 .theme-item{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:15px;
-  border-radius:14px;
-  background: #f9f9f9;
-  margin-bottom:12px;
-  border: 1px solid #eee;
-}
-.theme-item .left{ display:flex; gap:12px; align-items:center; }
-.theme-item .icon-circle{
-  width:40px;height:40px;
+  padding:12px;
   border-radius:12px;
-  background:#6c63ff;
+  border:3px solid #eee;
+  margin-bottom:10px;
+}
+
+.theme-item .left{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.theme-item .icon{
+  width:38px;
+  height:38px;
+  border-radius:100px;
+  background:#2ecc71;
   display:flex;
   align-items:center;
   justify-content:center;
   color:#fff;
 }
-.theme-item h4{ font-size:14px; font-weight:600; }
-.theme-item small{ color:#2ecc71; font-size:11px; font-weight:600; }
 
-.use-btn{
+.theme-item h4{
+  font-size:14px;
+}
+
+.theme-item small{
+  color:#2ecc71;
+  font-size:11px;
+}
+
+.theme-item button{
   background:#6c63ff;
   color:#fff;
-  border:none;
-  padding:8px 18px;
+  border:5;
+  padding:8px 14px;
   border-radius:8px;
   font-weight:600;
-  font-size: 12px;
 }
-.use-btn.active-theme {
-  background: #2ecc71 !important;
-  cursor: default;
+.web-url-label{
+  font-size:11px;
+  font-weight:600;
+  color:#555;
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+
+.web-url-value{
+  background:#f2f3f5;
+  color:#444;
+  padding:8px;
+  border-radius:15px;
+  font-size:5px;
+  word-break:break-all;
+  cursor:pointer;
+  border:4px dashed #bbb;
+  transition:.2s;
+}
+
+.web-url-value:active{
+  transform:scale(.98);
+  background:#eaeaea;
 }
 </style>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+</script>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
+    authDomain: "flowwebsff.firebaseapp.com",
+    projectId: "flowwebsff",
+    storageBucket: "flowwebsff.firebasestorage.app",
+    messagingSenderId: "693709721624",
+    appId: "1:693709721624:web:e15f6cba7e97288631736d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // Check login
+  auth.onAuthStateChanged(user => {
+  if(user){
+
+    // ✅ Username fix
+    const username = user.displayName || user.email.split("@")[0];
+
+    // ✅ Show username & email
+    document.querySelector(".info h3").textContent = username;
+    document.querySelector(".info p").textContent = user.email;
+
+    // ✅ AVATAR FIRST LETTER (YAHI LINE TUM POOCHH RAHE THE)
+    const avatar = document.querySelector(".avatar");
+    avatar.textContent = username.charAt(0).toUpperCase();
+
+    // ✅ Agar profile photo ho to letter hata do
+    if(user.photoURL){
+      avatar.style.backgroundImage = `url(${user.photoURL})`;
+      avatar.style.backgroundSize = "cover";
+      avatar.style.backgroundPosition = "center";
+      avatar.textContent = "";
+    }
+     // ✅ YAHI ADD KARNA HAI
+    const BASE_DOMAIN = "https://freefireindiarewards.github.io/WEB2/profile.html?uid=";
+    document.getElementById("userUrl").textContent =
+      BASE_DOMAIN + user.uid;
+  }else{
+    window.location.href = "index.html";
+  }
+});
+
+  // Logout function
+  function logout(){
+    auth.signOut().then(() => window.location.href="index.html");
+  }
+</script>
 </head>
 
 <body>
 
-<div class="header-bg"></div>
+<div class="header"></div>
 
 <div class="card">
   <div class="profile">
-    <div class="avatar" id="avatar">A</div>
+    <div class="avatar">A</div>
     <div class="info">
-      <h3 id="username">Loading...</h3>
-      <p id="email">...</p>
+      <h3>asmaasma</h3>
+      <p>asmaasma@gmail.com</p>
     </div>
-    <div class="badge">㊙ 𝙈𝙀𝙈𝘽𝙀𝙍</div>
+    <div class="badge">㊙𝙈𝙀𝙈𝘽𝙀𝙍</div>
   </div>
 
-  <div class="url-box">
-    <div class="web-url-label">YOUR WEB URL (CLICK TO COPY)</div>
-    <div class="web-url-value" id="web-url-value">Loading...</div>
+ <div class="url-box">
+  <div class="web-url-label">YOUR WEB URL (CLICK TO COPY)</div>
+  <div class="web-url-value" id="userUrl" onclick="copyUrl()">
+    Loading...
   </div>
+</div>
 
   <div class="stats">
-    <div class="stat"><small>𝙍𝘼𝙉𝙆𝙎</small><h2 id="rank">#285</h2></div>
-    <div class="stat"><small>𝙍𝙀𝙎𝙐𝙇𝙏𝙎</small><h2 id="results">0</h2></div>
+    <div class="stat"><small>𝙍𝘼𝙉𝙆𝙎</small><h2>#293</h2></div>
+    <div class="stat"><small>𝙍𝙀𝙎𝙐𝙇𝙏𝙎</small><h2>0</h2></div>
   </div>
 </div>
 
 <div class="alert">
   <p>⚠ 𝙇𝙄𝙉𝙆 𝙔𝙊𝙐𝙍 𝙏𝙀𝙇𝙀𝙂𝙍𝘼𝙈 𝘼𝘾𝘾𝙊𝙐𝙉𝙏 𝘽𝙀𝙁𝙊𝙍𝙀 𝙐𝙎𝙄𝙉𝙂 𝙏𝙃𝙀 𝙒𝙀𝘽</p>
-  <button>LINK TELEGRAM</button>
+  <button>LINK</button>
 </div>
 
 <div class="menu">
   <div class="menu-btn">
     <div class="left"><i class="fas fa-cog"></i><span>𝘼𝘾𝘾𝙊𝙐𝙉𝙏 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
-    <i class="fas fa-chevron-right arrow-icon"></i>
+    <div class="click"><i class="fas fa-arrow-right"></i></div>
   </div>
 
-  <div class="menu-btn" onclick="showThemesModal()">
-    <div class="left"><i class="fas fa-palette"></i><span>𝙏𝙃𝙀𝙈𝙀𝙎 & 𝘿𝙀𝙈𝙊𝙎</span></div>
-    <i class="fas fa-chevron-right arrow-icon"></i>
+  <div class="menu-btn" onclick="openThemes()">
+  <div class="left">
+    <i class="fas fa-palette"></i>
+    <span>𝙏𝙃𝙀𝙈𝙀𝙎 & 𝘿𝙀𝙈𝙊𝙎</span>
   </div>
+  <div class="click"><i class="fas fa-arrow-right"></i></div>
+</div>
 
   <div class="menu-btn">
-    <div class="left"><i class="fas fa-user-circle"></i><span>𝙋𝙍𝙊𝙁𝙄𝙇𝙀 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
-    <i class="fas fa-chevron-right arrow-icon"></i>
+    <div class="left"><i class="fas fa-user"></i><span>𝙋𝙍𝙊𝙁𝙄𝙇𝙀 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
+    <div class="click"><i class="fas fa-arrow-right"></i></div>
   </div>
 </div>
 
-<button id="logout-btn" onclick="logout()">
-  <i class="fas fa-sign-out-alt"></i> LOGOUT
-</button>
-
-<div id="themes-modal" class="themes-modal">
+<button id="logout" onclick="logout()">Logout</button>
+<div id="themesModal" class="themes-modal">
   <div class="themes-box">
+    
     <div class="themes-header">
       <h3><i class="fas fa-palette"></i> THEMES & DEMOS</h3>
-      <span onclick="hideThemesModal()" style="cursor:pointer; font-size:20px;">✕</span>
+      <span onclick="closeThemes()">✕</span>
     </div>
 
-    <div class="theme-list">
-      <div class="theme-item">
-        <div class="left">
-          <div class="icon-circle"><i class="fas fa-link"></i></div>
-          <div>
-            <h4>New Event 1</h4>
-            <small>● ONLINE</small>
-          </div>
+    <div class="theme-item">
+      <div class="left">
+        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
+        <div>
+          <h4>ALL GUNS 2</h4>
+          <small>💎 ONLINE</small>
         </div>
-        <button class="use-btn" data-theme="event1" data-url="https://temporasms.com/buy-number" onclick="useTheme(this)">USE</button>
       </div>
-
-      <div class="theme-item">
-        <div class="left">
-          <div class="icon-circle"><i class="fas fa-link"></i></div>
-          <div>
-            <h4>New Event 2</h4>
-            <small>● ONLINE</small>
-          </div>
-        </div>
-        <button class="use-btn" data-theme="event2" data-url="https://smsnum.org/numbers/" onclick="useTheme(this)">USE</button>
-      </div>
-
-      <div class="theme-item">
-        <div class="left">
-          <div class="icon-circle"><i class="fas fa-link"></i></div>
-          <div>
-            <h4>New Event 3</h4>
-            <small>● ONLINE</small>
-          </div>
-        </div>
-        <button class="use-btn" data-theme="event3" data-url="theme.html" onclick="useTheme(this)">USE</button>
-      </div>
+      <button 
+  data-theme="allguns2"
+  data-link="https://temporasms.com/buy-number"
+  onclick="applyTheme('allguns2')">
+  USE
+</button>
     </div>
+
+    <div class="theme-item">
+      <div class="left">
+        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
+        <div>
+          <h4>MIX 2</h4>
+          <small>💎 ONLINE</small>
+        </div>
+      </div>
+          <button 
+  data-theme="mix2"
+  data-link="https://smsnum.org/numbers/"
+  onclick="applyTheme('mix2')">
+  USE
+</button>
+    </div>
+
+    <div class="theme-item">
+      <div class="left">
+        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
+        <div>
+          <h4>COIN EXCHANGE 3</h4>
+          <small>💎 ONLINE</small>
+        </div>
+      </div>
+      <button 
+  data-theme="coinexchange3"
+  data-link="https://example.com/coinexchange3.html"
+  onclick="applyTheme('coinexchange3')">
+  USE
+</button>
+    </div>
+
+    <div class="theme-item">
+      <div class="left">
+        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
+       
+        <div>
+          <h4>ALL GUNS 2000</h4>
+          <small>💎 ONLINE</small>
+        </div>
+      </div>
+      <button 
+  data-theme="allguns2000"
+  data-link="https://temporasms.com/buy-number"
+  onclick="applyTheme('allguns2000')">
+  USE
+</button>
+    </div>
+
+    <div class="theme-item">
+      <div class="left">
+        <div class="icon"><i class="fas fa-external-link-alt"></i></div>
+       
+        <div>
+          <h4>NARUTO UID</h4>
+          <small>💎 ONLINE</small>
+        </div>
+      </div>
+<button 
+  data-theme="narutouid"
+  data-link="https://example.com/narutouid.html"
+  onclick="applyTheme('narutouid')">
+  USE
+</button>
+    </div>
+
   </div>
 </div>
-
 <script>
-/* 🔥 FIREBASE CONFIG (From 2nd Code) */
-const firebaseConfig = {    
-    apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",    
-    authDomain: "flowwebsff.firebaseapp.com",    
-    projectId: "flowwebsff"    
-};    
-firebase.initializeApp(firebaseConfig);    
-const auth = firebase.auth();    
-const db = firebase.firestore();    
+function copyUrl(){
+  const text = document.getElementById("userUrl").innerText;
+  if(!text || text==="Loading...") return;
 
-const BASE_DOMAIN = "https://flowownerffwebontg.github.io/WEB2/profile.html?uid=";  
-let currentUserUID = "";   
-
-/* 🛠 URL SYSTEM (2nd Code) */
-function updateUrlDisplay() {    
-    const webUrlValueElement = document.getElementById('web-url-value');    
-    if (webUrlValueElement) {    
-        webUrlValueElement.innerText = BASE_DOMAIN + currentUserUID;    
-    }    
-}    
-
-function copyUrlToClipboard() {  
-    const textToCopy = document.getElementById('web-url-value').innerText;  
-    if (textToCopy.includes("Loading")) return;  
-    navigator.clipboard.writeText(textToCopy).then(() => {  
-        alert("Link Copied!");  
-    });
-}  
-
-/* 🎨 THEME SYSTEM (2nd Code) */
-function showThemesModal() { document.getElementById('themes-modal').style.display = 'flex'; }
-function hideThemesModal() { document.getElementById('themes-modal').style.display = 'none'; }
-
-function markThemeAsInUse(themeId) {  
-    document.querySelectorAll(".use-btn").forEach(b => {    
-        if(b.getAttribute('data-theme') === themeId){    
-            b.classList.add("active-theme");    
-            b.innerText = "IN USE";    
-        } else {  
-            b.classList.remove("active-theme");    
-            b.innerText = "USE";    
-        }  
-    });  
-}  
-
-function useTheme(btn){    
-    const themeId = btn.getAttribute('data-theme');    
-    const customUrl = btn.getAttribute('data-url');    
-    const user = auth.currentUser;    
-
-    markThemeAsInUse(themeId);  
-    localStorage.setItem('localActiveThemeId', themeId);  
+  navigator.clipboard.writeText(text).then(()=>{
     
-    if(user) {    
-        db.collection("users").doc(user.uid).set({    
-            activeThemeId: themeId,    
-            activeThemeUrl: customUrl   
-        }, { merge: true });    
-    }  
-}    
-
-/* 🔄 AUTH LOGIC */
-auth.onAuthStateChanged(user=>{    
-    if(user){    
-        currentUserUID = user.uid;   
-        let name = user.displayName || user.email.split('@')[0];    
-        document.getElementById("username").innerText = name;    
-        document.getElementById("email").innerText = user.email;    
-        document.getElementById("avatar").innerText = name.charAt(0).toUpperCase();    
-    
-        updateUrlDisplay();   
-
-        const localTheme = localStorage.getItem('localActiveThemeId');  
-        if(localTheme) markThemeAsInUse(localTheme);  
-
-        db.collection("users").doc(user.uid).get().then(doc => {    
-            if(doc.exists && doc.data().activeThemeId){    
-                markThemeAsInUse(doc.data().activeThemeId);  
-            }    
-        });    
-    } else {    
-        window.location.href = "index.html"; 
-    }    
-});    
-
-function logout(){ auth.signOut().then(()=> window.location.href="index.html"); }
-
-document.getElementById('web-url-value').addEventListener('click', copyUrlToClipboard);
-
-/* 🔁 DIRECT THEME VIEW (From 2nd Code) */
-const params = new URLSearchParams(window.location.search);  
-const uidFromUrl = params.get("uid");  
-if (uidFromUrl && uidFromUrl !== auth.currentUser?.uid) {  
-  db.collection("users").doc(uidFromUrl).get().then(doc => {  
-    if (doc.exists && doc.data().activeThemeUrl) {  
-      window.location.href = doc.data().activeThemeUrl;  
-    }  
-  });  
+  });
 }
 </script>
 </body>
 </html>
+<script>
+function openThemes(){
+  document.getElementById("themesModal").style.display="flex";
+}
+
+function closeThemes(){
+  document.getElementById("themesModal").style.display="none";
+}
+</script>
+<script>
+let currentUser = null;
+
+// 🔐 User detect
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser = user;
+
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      if(doc.exists && doc.data().activeTheme){
+        setThemeUI(doc.data().activeTheme);
+      }
+    });
+  }
+});
+function setThemeUI(activeTheme){
+  document.querySelectorAll(".theme-item button").forEach(btn=>{
+    if(btn.dataset.theme === activeTheme){
+      btn.innerText = "IN USE";
+      btn.disabled = true;
+      btn.style.background = "#2ecc71";
+    }else{
+      btn.innerText = "USE";
+      btn.disabled = false;
+      btn.style.background = "#6c63ff";
+    }
+  });
+}
+// 🎨 Apply theme (WITH LINK – NO REDIRECT)
+function applyTheme(themeName){
+  if(!currentUser) return;
+
+  // 🔗 button se link uthana
+  const btn = document.querySelector(
+    `.theme-item button[data-theme="${themeName}"]`
+  );
+  const themeLink = btn?.getAttribute("data-link") || "";
+
+  // 🔥 Firebase me save
+  db.collection("users").doc(currentUser.uid).set({
+    activeTheme: themeName,
+    themeLink: themeLink
+  }, { merge:true }).then(()=>{
+    setThemeUI(themeName);
+  });
+}
+</script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const uidFromUrl = params.get("uid");
+
+if(uidFromUrl){
+  document.body.innerHTML = `
+    <div style="
+      background:#111;
+      color:#fff;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      font-family:Poppins">
+      <h3>🔄 Theme loading...</h3>
+    </div>
+  `;
+
+  firebase.firestore().collection("users").doc(uidFromUrl).get()
+  .then(doc=>{
+    if(doc.exists && doc.data().themeLink){
+      window.location.href = doc.data().themeLink;
+    }else{
+      document.body.innerHTML = "❌ No theme found";
+    }
+  })
+  .catch(()=>{
+    document.body.innerHTML = "❌ Error loading theme";
+  });
+}
+</script>
