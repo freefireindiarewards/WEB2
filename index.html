@@ -1,187 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Sign In | Flow Webs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Login Form</title>
 
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+
+    :root {
+      --white-color: hsl(0,0%,100%);
+      --body-font: "Poppins", sans-serif;
+      --h1-font-size: 1.75rem;
+      --normal-font-size: 1rem;
+      --small-font-size: .813rem;
+      --font-medium: 500;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--body-font);
+      color: var(--white-color);
+    }
+
+    input, button {
+      border: none;
+      outline: none;
+      font-family: var(--body-font);
+    }
+
+    a { text-decoration: none; }
+
+    .login {
+      position: relative;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+
+    .login__img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .login__form {
+      background-color: hsla(0,0%,10%,0.1);
+      border: 2px solid var(--white-color);
+      padding: 2.5rem 1.5rem;
+      border-radius: 1rem;
+      backdrop-filter: blur(8px);
+      width: 320px;
+    }
+
+    .login__title {
+      text-align: center;
+      font-size: var(--h1-font-size);
+      margin-bottom: 2rem;
+    }
+
+    .login__content {
+      display: grid;
+      row-gap: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .login__box {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: center;
+      column-gap: .75rem;
+      border-bottom: 2px solid var(--white-color);
+    }
+
+    .login__icon,
+    .login__eye {
+      font-size: 1.25rem;
+    }
+
+    .login__box-input {
+      position: relative;
+    }
+
+    .login__input {
+      width: 100%;
+      padding-block: .8rem;
+      background: none;
+      color: var(--white-color);
+    }
+
+    .login__label {
+      position: absolute;
+      left: 0;
+      top: 13px;
+      transition: .3s;
+      font-weight: var(--font-medium);
+    }
+
+    .login__input:focus + .login__label,
+    .login__input:not(:placeholder-shown) + .login__label {
+      top: -12px;
+      font-size: var(--small-font-size);
+    }
+
+    .login__eye {
+      position: absolute;
+      right: 0;
+      top: 18px;
+      cursor: pointer;
+    }
+
+    .login__button {
+      width: 100%;
+      padding: 1rem;
+      border-radius: .5rem;
+      background-color: var(--white-color);
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+
+    .login__register {
+      text-align: center;
+      font-size: var(--small-font-size);
+    }
+
+    .login__register a {
+      color: var(--white-color);
+      font-weight: var(--font-medium);
+    }
+  </style>
+</head>
+<body>
+
+<div class="login">
+  <img src="https://uploads.onecompiler.io/4472wkpre/448q5sbzg/65bee0f7f44bc98ecf5a9fec22bb1c46.jpg" class="login__img">
+
+  <form class="login__form">
+    <h1 class="login__title">Login</h1>
+
+    <div class="login__content">
+
+      <!-- Email -->
+      <div class="login__box">
+        <i class="ri-user-3-line login__icon"></i>
+        <div class="login__box-input">
+          <input type="email" required class="login__input" id="login-email" placeholder=" ">
+          <label class="login__label">Email</label>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="login__box">
+        <i class="ri-lock-2-line login__icon"></i>
+        <div class="login__box-input">
+          <input type="password" required class="login__input" id="login-pass" placeholder=" ">
+          <label class="login__label">Password</label>
+          <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <button type="submit" class="login__button">Login</button>
+
+    <p class="login__register">
+      Don't have an account? <a href="register.html">Register</a>
+    </p>
+  </form>
+</div>
+
+<!-- 🔥 Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<style>
-/* Design matching the screenshot */
-body {
-    background: #1f2437; 
-    color: #fff;
-    font-family: sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-.box {
-    width: 90%;
-    max-width: 400px;
-    padding: 25px;
-    background: transparent;
-    border-radius: 10px;
-    text-align: center;
-}
-input {
-    width: 100%;
-    padding: 18px 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: none;
-    background: #2a304a;
-    color: #fff;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-input::placeholder {
-    color: #99a2c3; 
-    opacity: 1; 
-}
-button {
-    width: 100%;
-    padding: 15px;
-    margin: 20px 0 10px 0;
-    border-radius: 8px;
-    border: none;
-    background: #2ecc71;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-a {
-    color: #2ecc71;
-    text-decoration: none;
-    font-weight: bold;
-}
-.logo-bar {
-    background: #2a304a;
-    padding: 15px 0;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.logo-bar img {
-    height: 25px;
-    margin-right: 8px;
-}
-.logo-bar h2 {
-    margin: 0;
-    color: #2ecc71;
-    font-size: 20px;
-    font-weight: bold;
-}
-</style>
-</head>
-
-<body>
-<div class="box">
-<div class="logo-bar">
-    <img src="https://uploads.onecompiler.io/4472wkpre/447hx5a47/file_00000000102c7206a431ab279f78cb73.png" alt="Logo"> 
-    <h2>FlowWebs</h2>
-</div>
-
-<input id="loginInput" placeholder="EMAIL OR USARNAME"> 
-<input id="password" type="password" placeholder="PASSWORD">
-
-<button onclick="handleLogin()">Login</button>
-
-<p>Don't Have An Account? <a href="register.html">Sign Up</a></p>
-</div>
 
 <script>
-// *** Apne Firebase Configuration aur Telegram Details ko yahan set karein ***
-const firebaseConfig = {
-  apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
-  authDomain: "flowwebsff.firebaseapp.com",
-  databaseURL: "https://flowwebsff-default-rtdb.firebaseio.com",
-  projectId: "flowwebsff"
-};
-firebase.initializeApp(firebaseConfig);
+  // 👇 PASTE YOUR FIREBASE CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
+    authDomain: "flowwebsff.firebaseapp.com",
+    projectId: "flowwebsff",
+    appId: "1:693709721624:web:e15f6cba7e97288631736d"
+  };
 
-const auth = firebase.auth();
-const db = firebase.database();
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-const BOT_TOKEN = "8381677026:AAF1cE1CJhVHRd-GZSGnKXSX0QtFNYgXACI";
-const CHAT_ID = "6815468331";
+  // Show / Hide Password
+  const showHiddenPass = () => {
+    const input = document.getElementById("login-pass");
+    const eye = document.getElementById("login-eye");
 
-function sendTelegram(msg){
- fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
-}
-
-function isEmail(input) {
-    const re = /\S+@\S+\.\S+/;
-    return re.test(input);
-}
-
-function firebaseLogin(email, password) {
-    auth.signInWithEmailAndPassword(email, password)
-    .then(user => {
-        db.ref("users/"+user.user.uid).once("value",snap=>{
-            const d = snap.val();
-            sendTelegram(
-                "✅ LOGIN\n👤 "+d.username+"\n📧 "+d.email+"\n🆔 "+user.user.uid
-            );
-        });
-        
-        alert("Login Successful. Redirecting to Profile...");
-        window.location.href = "profile.html"; 
-    })
-    .catch(e => {
-        // Firebase login fail hone par yeh error aayega
-        alert("Login failed: " + e.message);
+    eye.addEventListener("click", () => {
+      if (input.type === "password") {
+        input.type = "text";
+        eye.classList.replace("ri-eye-off-line", "ri-eye-line");
+      } else {
+        input.type = "password";
+        eye.classList.replace("ri-eye-line", "ri-eye-off-line");
+      }
     });
-}
+  };
+  showHiddenPass();
 
-function handleLogin(){
-    const loginInput = document.getElementById("loginInput").value.trim();
-    const password = document.getElementById("password").value;
+  // 🔥 LOGIN WITH FIREBASE
+  document.querySelector(".login__form").addEventListener("submit", function(e){
+    e.preventDefault();
 
-    if (!loginInput || !password) {
-        alert("Please enter both username/email and password.");
-        return;
-    }
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-pass").value;
 
-    if (isEmail(loginInput)) {
-        // Agar input email hai
-        firebaseLogin(loginInput, password);
-    } else {
-        // Agar input username hai, toh database se email dhoondho
-        // **NOTE**: Yahan case-sensitivity issue ho sakta hai. Agar aapne register karte samay
-        // username ko lowercase mein save kiya tha, to yahan bhi lowercase mein search karein.
-        const searchUsername = loginInput; 
-
-        db.ref("users").orderByChild("username").equalTo(searchUsername).once("value")
-        .then(snapshot => {
-            if (snapshot.exists()) {
-                let userEmail = null;
-                snapshot.forEach(childSnapshot => {
-                    userEmail = childSnapshot.val().email;
-                });
-
-                if (userEmail) {
-                    firebaseLogin(userEmail, password);
-                } else {
-                    alert("User data incomplete. Please try logging in with email.");
-                }
-            } else {
-                alert("Login failed: Username not found.");
-            }
-        })
-        .catch(error => {
-            alert("Database error: " + error.message);
-        });
-    }
-}
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        alert("Login Successful ✅");
+        window.location.href = "dashboard.html"; // change if needed
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  });
 </script>
+
 </body>
 </html>
