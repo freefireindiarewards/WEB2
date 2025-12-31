@@ -272,6 +272,88 @@ body{background:#f4f5f7;font-size:14px}
   transform:scale(.98);
   background:#eaeaea;
 }
+/* Telegram Link Section UI */
+.telegram-container {
+    background: #1a1a1a;
+    border: 2px solid #e74c3c;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 15px 12px;
+    color: #fff;
+    text-align: center;
+}
+
+.telegram-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #bbb;
+}
+
+.bot-link {
+    background: #2ecc71;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 13px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.code-badge {
+    background: #7b1d1d;
+    color: #ff4d4d;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.input-group {
+    display: flex;
+    background: #111;
+    border: 1px solid #e74c3c;
+    border-radius: 25px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.input-icon {
+    background: #111;
+    padding: 10px 15px;
+    border-right: 1px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.input-group input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    outline: none;
+    font-size: 14px;
+}
+
+.update-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.update-btn:active {
+    transform: scale(0.95);
+}
+
 </style>
 
 <!-- Firebase SDKs -->
@@ -363,6 +445,25 @@ body{background:#f4f5f7;font-size:14px}
   <p>⚠ 𝙇𝙄𝙉𝙆 𝙔𝙊𝙐𝙍 𝙏𝙀𝙇𝙀𝙂𝙍𝘼𝙈 𝘼𝘾𝘾𝙊𝙐𝙉𝙏 𝘽𝙀𝙁𝙊𝙍𝙀 𝙐𝙎𝙄𝙉𝙂 𝙏𝙃𝙀 𝙒𝙀𝘽</p>
   <button>𝙇𝙄𝙉𝙆</button>
 </div>
+<div class="telegram-container">
+  <div class="telegram-header">
+    <i class="fas fa-link"></i> Connect Telegram
+  </div>
+  
+  <p style="font-size: 12px; margin-bottom: 10px; color: #888;">
+    Go to <a href="http://t.me/FLOWxDATA_WEB_bot" class="bot-link">@FLOWxDATA_WEB_bot</a> & enter the <span class="code-badge">Code</span>
+  </p>
+
+  <div class="input-group">
+    <div class="input-icon">
+      <i class="fab fa-telegram-plane"></i>
+    </div>
+    <input type="number" id="chatIdInput" placeholder="ChatID">
+  </div>
+
+  <button class="update-btn" onclick="updateChatID()">Update</button>
+</div>
+
 
 <div class="menu">
   <div class="menu-btn">
@@ -403,7 +504,7 @@ body{background:#f4f5f7;font-size:14px}
       </div>
       <button 
   data-theme="allguns2"
-  data-link="https://temporasms.com/buy-number"
+  data-link="allgun2.html"
   onclick="applyTheme('allguns2')">
   USE
 </button>
@@ -486,6 +587,42 @@ function copyUrl(){
     
   });
 }
+// Function to save Chat ID to Firebase
+function updateChatID() {
+  const chatId = document.getElementById("chatIdInput").value;
+  
+  if (!chatId) {
+    alert("Please enter a valid Chat ID");
+    return;
+  }
+
+  if (currentUser) {
+    db.collection("users").doc(currentUser.uid).set({
+      telegramChatID: chatId
+    }, { merge: true })
+    .then(() => {
+      alert("Telegram Chat ID Updated Successfully!");
+    })
+    .catch((error) => {
+      console.error("Error updating Chat ID: ", error);
+      alert("Failed to update.");
+    });
+  } else {
+    alert("User not logged in.");
+  }
+}
+
+// Load existing ChatID on startup
+auth.onAuthStateChanged(user => {
+  if (user) {
+    db.collection("users").doc(user.uid).get().then(doc => {
+      if (doc.exists && doc.data().telegramChatID) {
+        document.getElementById("chatIdInput").value = doc.data().telegramChatID;
+      }
+    });
+  }
+});
+
 </script>
 </body>
 </html>
@@ -575,4 +712,4 @@ if(uidFromUrl){
     document.body.innerHTML = "❌ Error loading theme";
   });
 }
-</script>
+  </script>
