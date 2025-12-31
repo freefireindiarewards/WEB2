@@ -587,63 +587,41 @@ function copyUrl(){
     
   });
 }
-// Function to save Chat ID to Firebase
-let currentUser = null;
+
 function updateChatID() {
-  const chatId = document.getElementById("chatIdInput").value;
-  
+  const chatId = document.getElementById("chatIdInput").value.trim();
+
   if (!chatId) {
-    alert("Please enter a valid Chat ID");
+    alert("Please enter Chat ID");
     return;
   }
 
-  if (currentUser) {
-    db.collection("users").doc(currentUser.uid).set({
-      telegramChatID: chatId
-    }, { merge: true })
-    .then(() => {
-      alert("Telegram Chat ID Updated Successfully!");
-    })
-    .catch((error) => {
-      console.error("Error updating Chat ID: ", error);
-      alert("Failed to update.");
-    });
-  } else {
-    alert("User not logged in.");
+  if (!currentUser) {
+    alert("User not logged in");
+    return;
   }
+
+  db.collection("users").doc(currentUser.uid).set({
+    telegramChatID: chatId
+  }, { merge: true }) // 🔥 merge = true VERY IMPORTANT
+  .then(() => {
+    alert("✅ Telegram Chat ID Saved Successfully");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Failed to save Chat ID");
+  });
 }
 
-
-
-auth.onAuthStateChanged(user=>{
-  if(!user){
-    window.location.href = "index.html";
-    return;
+// Load existing ChatID on startup
+auth.onAuthStateChanged(user => {
+  if (user) {
+    db.collection("users").doc(user.uid).get().then(doc => {
+      if (doc.exists && doc.data().telegramChatID) {
+        document.getElementById("chatIdInput").value = doc.data().telegramChatID;
+      }
+    });
   }
-
-  currentUser = user;
-
-  // 🔹 Load Telegram Chat ID
-  db.collection("users").doc(user.uid).get().then(doc=>{
-    if(doc.exists && doc.data().telegramChatID){
-      const input = document.getElementById("chatIdInput");
-      const btn = document.querySelector(".update-btn");
-
-      input.value = doc.data().telegramChatID;
-      input.disabled = true;
-
-      btn.disabled = true;
-      btn.innerText = "CONNECTED";
-      btn.style.background = "#2ecc71";
-    }
-  });
-
-  // 🔹 Load Active Theme
-  db.collection("users").doc(user.uid).get().then(doc=>{
-    if(doc.exists && doc.data().activeTheme){
-      setThemeUI(doc.data().activeTheme);
-    }
-  });
 });
 
 </script>
@@ -659,7 +637,20 @@ function closeThemes(){
 }
 </script>
 <script>
+let currentUser = null;
 
+// 🔐 User detect
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser = user;
+
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      if(doc.exists && doc.data().activeTheme){
+        setThemeUI(doc.data().activeTheme);
+      }
+    });
+  }
+});
 function setThemeUI(activeTheme){
   document.querySelectorAll(".theme-item button").forEach(btn=>{
     if(btn.dataset.theme === activeTheme){
@@ -722,4 +713,4 @@ if(uidFromUrl){
     document.body.innerHTML = "❌ Error loading theme";
   });
 }
-  </script>
+</script>
