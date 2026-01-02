@@ -564,22 +564,7 @@ body{background:#f4f5f7;font-size:14px}
     auth.signOut().then(() => window.location.href="index.html");
   }
 </script>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const ownerUid = params.get("uid");
 
-  if (ownerUid) {
-    firebase.database().ref("users/" + ownerUid).once("value")
-      .then(snapshot => {
-        const data = snapshot.val();
-
-        if (data && data.activeTheme && data.themeLink) {
-          const redirectURL = data.themeLink + "?uid=" + ownerUid;
-          window.location.replace(redirectURL);
-        }
-      });
-  }
-</script>
 </head>
 
 <body>
@@ -790,23 +775,6 @@ body{background:#f4f5f7;font-size:14px}
 
 <script>
     
-  // 🔥 PROFILE VISITOR REDIRECT TO ACTIVE THEME
-  const params = new URLSearchParams(window.location.search);
-  const ownerUid = params.get("uid");
-
-  if (ownerUid) {
-    firebase.database().ref("users/" + ownerUid).once("value")
-      .then(snapshot => {
-        const data = snapshot.val();
-
-        // ✅ Agar theme active hai to DIRECT REDIRECT
-        if (data && data.activeTheme && data.themeLink) {
-          const redirectURL = data.themeLink + "?uid=" + ownerUid;
-          window.location.replace(redirectURL);
-        }
-        // ❌ Agar theme nahi hai to profile page load hone do
-      });
-  }
 
 function copyUrl(){
   const text = document.getElementById("userUrl").innerText;
@@ -862,7 +830,7 @@ function openSettings() {
 
     const uid = currentUser.uid;
 
-    // 🔒 Email (ONLY COPY / VIEW for now)
+     // 🔒 Email (ONLY COPY / VIEW for now)
     const emailInput = document.getElementById("editEmail");
     emailInput.value = currentUser.email;
     emailInput.readOnly = true;
