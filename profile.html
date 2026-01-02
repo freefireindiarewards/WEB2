@@ -489,6 +489,8 @@ body{background:#f4f5f7;font-size:14px}
 .pass-input-group input {
     color: #fff !important;
           }
+          
+
 
 </style>
 
@@ -572,8 +574,8 @@ body{background:#f4f5f7;font-size:14px}
   <div class="profile">
     <div class="avatar">A</div>
     <div class="info">
-      <h3>Usarname</h3>
-      <p>example@gmail.com</p>
+      <h3>asmaasma</h3>
+      <p>asmaasma@gmail.com</p>
     </div>
     <div class="badge">㊙𝙈𝙀𝙈𝘽𝙀𝙍</div>
   </div>
@@ -611,10 +613,11 @@ body{background:#f4f5f7;font-size:14px}
 </div>
 
 
-<div class="menu-btn" id="accountSettingsBtn">
-  <div class="left"><i class="fas fa-cog"></i><span>𝘼𝘾𝘾𝙊𝙐𝙉𝙏 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
-  <div class="click"><i class="fas fa-arrow-right"></i></div>
-</div>
+<div class="menu">
+  <div class="menu-btn">
+    <div class="left"><i class="fas fa-cog"></i><span>𝘼𝘾𝘾𝙊𝙐𝙉𝙏 𝙎𝙀𝙏𝙏𝙄𝙉𝙂𝙎</span></div>
+    <div class="click"><i class="fas fa-arrow-right"></i></div>
+  </div>
 
   <div class="menu-btn" onclick="openThemes()">
   <div class="left">
@@ -691,10 +694,12 @@ body{background:#f4f5f7;font-size:14px}
     </div>
 </div>
 
+
             <button class="save-btn" onclick="saveAccountSettings()">Update</button>
         </div>
     </div>
 </div>
+
 
 
 <div id="themesModal" class="themes-modal">
@@ -826,7 +831,7 @@ function openSettings() {
     rtdb.ref("users/" + uid).once("value").then(snapshot => {
         const data = snapshot.val() || {};
 
-        // 🔒 Username (ONLY COPY / VIEW for now)
+// 🔒 Username (ONLY COPY / VIEW for now)
         const usernameInput = document.getElementById("editUsername");
         usernameInput.value = data.username || "";
         usernameInput.readOnly = true;
@@ -868,7 +873,30 @@ function saveAccountSettings() {
         .catch(err => alert("❌ Error: " + err.message));
 }
 
-document.getElementById("accountSettingsBtn").addEventListener("click", openSettings);
+// Click event for the "ACCOUNT SETTINGS" menu button
+document.querySelector(".menu-btn").onclick = openSettings;
+// ✅ UPDATE OPTION SAFE (future use)
+function saveAccountSettings() {
+    const newEmail = document.getElementById("editEmail").value;
+    const newUsername = document.getElementById("editUsername").value;
+    const uid = currentUser.uid;
+
+    // Email update (Firebase Auth)
+    currentUser.updateEmail(newEmail)
+        .then(() => {
+            // Username update (Realtime DB)
+            return rtdb.ref("users/" + uid).update({
+                username: newUsername
+            });
+        })
+        .then(() => {
+            alert("✅ Password Updated Successfully!");
+            location.reload();
+        })
+        .catch(err => alert("❌ Error: " + err.message));
+}
+
+
 
 function saveAccountSettings() {
     if (!currentUser) return;
