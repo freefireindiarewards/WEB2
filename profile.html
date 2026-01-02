@@ -436,6 +436,50 @@ body{background:#f4f5f7;font-size:14px}
     margin-top: 10px;
     cursor: pointer;
 }
+/* Change Password Section Styling */
+.password-section {
+    margin-top: 25px;
+    border-top: 5px solid #333;
+    padding-top: 20px;
+}
+
+.password-title {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Screenshot style inputs */
+.pass-input-group {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    height: 50px;
+    padding: 0 15px;
+}
+
+.pass-input-group i {
+    color: #888;
+    margin-right: 15px;
+}
+
+.pass-input-group input {
+    background: transparent;
+    border: 1px;
+    color: #fff;
+    width: 100%;
+    outline: 1px;
+}
+
+.pass-input-group.active-border {
+    border-color: #ff0050; /* Pink border like image */
+}
 
 
 </style>
@@ -618,12 +662,32 @@ body{background:#f4f5f7;font-size:14px}
                     <input type="text" id="editUsername" placeholder="Loading username...">
                 </div>
             </div>
+            <div class="password-section">
+    <div class="password-title">
+        CHANGE PASSWORD <i class="fas fa-key"></i>
+    </div>
+     
+ 
+    <div class="pass-input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="currentPass" placeholder="Current Password">
+    </div>
+
+    <div class="pass-input-group active-border">
+        <i class="fas fa-key"></i>
+        <input type="password" id="newPass" placeholder="New Password">
+    </div>
+
+    <div class="pass-input-group">
+        <i class="fas fa-key"></i>
+        <input type="password" id="confirmPass" placeholder="Confirm Password">
+    </div>
+</div>
 
             <button class="save-btn" onclick="saveAccountSettings()">Update</button>
         </div>
     </div>
 </div>
-
 
 
 <div id="themesModal" class="themes-modal">
@@ -799,7 +863,54 @@ function saveAccountSettings() {
 
 // Click event for the "ACCOUNT SETTINGS" menu button
 document.querySelector(".menu-btn").onclick = openSettings;
+
+function saveAccountSettings() {
+    if (!currentUser) return;
+
+    const uid = currentUser.uid;
+    const newPass = document.getElementById("newPass").value;
+    const confirmPass = document.getElementById("confirmPass").value;
+
+    // Validation
+    if (newPass === "" || confirmPass === "") {
+        alert("Please enter new password");
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        alert("New passwords do not match!");
+        return;
+    }
+
+    if (newPass.length < 6) {
+        alert("Password should be at least 6 characters");
+        return;
+    }
+
+    // 1. Firebase Auth mein password change karein
+    currentUser.updatePassword(newPass).then(() => {
+        
+        // 2. Realtime Database mein password save karein
+        rtdb.ref("users/" + uid).update({
+            password: newPass // Aapka database path yahi hona chahiye
+        }).then(() => {
+            alert("✅ Password Updated in Database!");
+            closeSettings();
+            // Fields clear karna
+            document.getElementById("currentPass").value = "";
+            document.getElementById("newPass").value = "";
+            document.getElementById("confirmPass").value = "";
+        });
+
+    }).catch((error) => {
+        if (error.code === "auth/requires-recent-login") {
+            alert("Security Error: Please Logout and Login again to change password.");
+        } else {
+            alert("❌ Error: " + error.message);
+        }
+    });
+}
+
 </script>
 </body>
-                    </html>
-                                                      
+</html>
