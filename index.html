@@ -4,133 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener | Black knowledge</title>
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        body {
-            background-color: #0f172a;
-            color: white;
-            font-family: sans-serif;
-        }
-        .custom-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-        }
-        .btn-gradient {
-            background: linear-gradient(90deg, #2563eb, #3b82f6);
-        }
-        .animate-in {
-            animation: fadeInUp 0.4s ease-out;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col font-sans">
 
-    <header class="p-4 bg-gray-900 border-b border-gray-800 shadow-xl">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-widest text-blue-500 uppercase">Black Knowledge</h1>
-            <a href="https://youtube.com/@blackknowledge_190" target="_blank" class="text-red-500 text-2xl hover:scale-110 transition">
+    <header class="bg-gray-800 p-4 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold text-gray-200">URL Shortener</h1>
+            <a id="ytLink" href="#" class="text-red-600 hover:text-red-400 text-3xl transition duration-300">
                 <i class="fab fa-youtube"></i>
             </a>
         </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4">
-        <div class="custom-card p-8 rounded-3xl shadow-2xl w-full max-w-md">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-link text-2xl text-blue-400"></i>
-                </div>
-                <h2 class="text-2xl font-extrabold">Shorten Your Link</h2>
-                <p class="text-gray-400 text-sm mt-1">Ek dum fast aur secure link generator</p>
-            </div>
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700 text-center">
+            <h2 class="text-2xl font-bold mb-6 text-blue-400">🔗 Link Shortener</h2>
+            <input type="url" id="longUrl" placeholder="Paste link here..." class="w-full p-4 rounded-lg bg-gray-700 border border-gray-600 mb-4 focus:outline-none focus:border-blue-500 text-white">
+            
+            <button onclick="shortenURL()" id="btnText" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition">Shorten Link</button>
 
-            <div class="space-y-4">
-                <input type="url" id="longUrl" placeholder="https://example.com" 
-                    class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-700 focus:border-blue-500 outline-none transition text-white">
+            <div id="resultBox" class="mt-8 hidden p-5 bg-gray-700 rounded-xl border border-dashed border-gray-500">
+                <p class="text-xs text-gray-400 mb-2">Pasand nahi aaya? Link par click karke badlein:</p>
+                <span id="shortLink" onclick="shortenURL()" class="text-blue-300 font-mono break-all text-xl block mb-4 cursor-pointer hover:text-blue-100 underline decoration-dotted"></span>
                 
-                <button onclick="shortenURL()" id="shortenBtn" 
-                    class="w-full btn-gradient py-4 rounded-2xl font-bold text-lg hover:opacity-90 active:scale-95 transition shadow-lg">
-                    Shorten Now
-                </button>
-            </div>
-
-            <div id="resultBox" class="mt-8 hidden animate-in">
-                <div class="p-5 bg-gray-800 rounded-2xl border-2 border-dashed border-blue-500/40 text-center">
-                    <p class="text-xs font-bold text-blue-400 uppercase mb-3">Chota Link Taiyar Hai:</p>
-                    <div id="shortLink" class="text-lg font-mono bg-black/30 p-3 rounded-lg mb-4 break-all"></div>
-                    
-                    <button id="copyBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold transition mb-4">
-                        <i class="fas fa-copy mr-2"></i> Copy Link
-                    </button>
-
-                    <div class="bg-white p-3 rounded-xl inline-block">
-                        <img id="qrCode" src="" alt="QR" class="w-28 h-28">
-                    </div>
-                </div>
+                <button id="copyBtn" class="bg-blue-500 px-10 py-3 rounded-full font-bold mb-4 shadow-lg active:scale-95 transition">Copy Link</button>
+                
+                <img id="qrCode" src="" alt="QR" class="w-32 h-32 mx-auto bg-white p-2 rounded-lg mt-2">
             </div>
         </div>
     </main>
 
-    <footer class="p-4 text-center text-gray-500 text-sm border-t border-gray-900">
-        Build with ❤️ by <span class="text-blue-500">Black Knowledge</span>
+    <footer class="bg-gray-800 p-4 text-center border-t border-gray-700">
+        <p class="text-gray-400">created by <strong class="text-blue-400">Black knowledge</strong></p>
     </footer>
 
     <script>
+        // YouTube Redirect Fix
+        document.getElementById('ytLink').onclick = function(e) {
+            e.preventDefault();
+            window.open("https://youtube.com/@blackknowledge_190?si=19CrKLvND1LzwkN9", "_blank");
+        };
+
         async function shortenURL() {
-            const input = document.getElementById('longUrl');
-            const btn = document.getElementById('shortenBtn');
-            let url = input.value.trim();
+            const longUrlInput = document.getElementById('longUrl');
+            let longUrl = longUrlInput.value;
+            const btn = document.getElementById('btnText');
+            
+            if(!longUrl) return Swal.fire('Opps!', 'Pehle link daalo bhai!', 'warning');
 
-            if(!url) return Swal.fire('Error', 'URL toh daalo bhai!', 'error');
-            if(!url.startsWith('http')) url = 'https://' + url;
+            // Agar user ne bina http ke dala ho toh add kar do
+            if(!longUrl.startsWith('http')) longUrl = 'https://' + longUrl;
 
-            btn.innerText = "Processing...";
-            btn.disabled = true;
-
+            btn.innerText = "Generating...";
+            
             try {
-                // Is.gd API (CORS friendly)
-                const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
-                const data = await res.json();
+                // TinyURL with unique string trick (taaki har baar naya link mile)
+                // Hum URL ke peeche ek random query parameter bhej rahe hain
+                const randomId = Math.random().toString(36).substring(7);
+                const separator = longUrl.includes('?') ? '&' : '?';
+                const cacheBusterUrl = longUrl + separator + "bk=" + randomId;
 
-                if(data.shorturl) {
-                    display(data.shorturl);
-                } else {
-                    // Fallback
-                    const res2 = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
-                    const short = await res2.text();
-                    display(short);
+                const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(cacheBusterUrl)}`);
+                
+                if(res.ok) {
+                    const shortUrl = await res.text();
+                    document.getElementById('resultBox').classList.remove('hidden');
+                    const shortLinkSpan = document.getElementById('shortLink');
+                    shortLinkSpan.innerText = shortUrl;
+                    document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${shortUrl}`;
+                    
+                    // FIXED COPY FUNCTION (Mobile Friendly)
+                    document.getElementById('copyBtn').onclick = () => {
+                        copyToClipboard(shortUrl);
+                    };
                 }
-            } catch (e) {
-                Swal.fire('Oops', 'Internet check karein!', 'error');
-            } finally {
-                btn.innerText = "Shorten Now";
-                btn.disabled = false;
+            } catch (e) { 
+                Swal.fire('Error', 'API response error. Net check karein.', 'error'); 
             }
+            btn.innerText = "Shorten Link";
         }
 
-        function display(shortUrl) {
-            document.getElementById('resultBox').classList.remove('hidden');
-            document.getElementById('shortLink').innerText = shortUrl;
-            document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${shortUrl}`;
-            
-            document.getElementById('copyBtn').onclick = () => {
-                const el = document.createElement('textarea');
-                el.value = shortUrl;
-                document.body.appendChild(el);
-                el.select();
+        // Sabse best copy method jo mobile par fail nahi hota
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
                 document.execCommand('copy');
-                document.body.removeChild(el);
-                Swal.fire({ title: 'Copied!', icon: 'success', timer: 1000, showConfirmButton: false });
-            };
+                Swal.fire({
+                    title: 'Copy Ho Gaya! ✅',
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonText: 'Mast!',
+                    confirmButtonColor: '#3b82f6',
+                    footer: '<a href="https://youtube.com/@blackknowledge_190" target="_blank" style="color:#3b82f6">YouTube: Black knowledge</a>',
+                    showDenyButton: true,
+                    denyButtonText: 'Home Page'
+                }).then((result) => { 
+                    if (result.isDenied) window.location.reload(); 
+                });
+            } catch (err) {
+                alert('Copy failed, please long press the link.');
+            }
+            document.body.removeChild(textArea);
         }
     </script>
 </body>
