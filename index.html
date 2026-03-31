@@ -1,158 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener | Black Knowledge</title>
+    <title>URL Shortener | Black knowledge</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        body { background-color: #E2E4F3; font-family: 'Poppins', sans-serif; color: #333; margin: 0; padding: 0; }
-        .phone-container { max-width: 400px; margin: 0 auto; background: #F8F9FE; min-height: 100vh; position: relative; padding-bottom: 80px; box-shadow: 0 0 50px rgba(0,0,0,0.1); }
-        .blue-gradient-card { background: linear-gradient(135deg, #6295E8, #4D79D1); border-radius: 30px; box-shadow: 0 15px 30px rgba(77, 121, 209, 0.3); }
-        .progress-container { background: #7D76EE; border-radius: 20px; color: white; }
-        .custom-input { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 15px; color: white; width: 100%; padding: 12px; outline: none; }
-        .custom-input::placeholder { color: rgba(255,255,255,0.7); }
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 360px; background: white; border-radius: 25px; display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .nav-item.active { background: #6295E8; color: white; border-radius: 15px; padding: 10px 15px; }
-        .feature-card-red { background: #E18776; border-radius: 25px; color: white; }
-        .feature-card-pink { background: #E882E4; border-radius: 25px; color: white; }
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: sans-serif;
+        }
+        .custom-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .btn-gradient {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+        }
+        .animate-in {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-<div class="phone-container">
-    <div class="flex justify-between items-center px-6 py-8">
-        <div class="flex items-center gap-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-12 h-12 rounded-xl bg-blue-100 p-1">
-            <div>
-                <p class="text-xs text-gray-400">Hello,</p>
-                <h3 class="font-bold text-gray-800">Black Knowledge</h3>
+    <header class="p-4 bg-gray-900 border-b border-gray-800 shadow-xl">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-widest text-blue-500 uppercase">Black Knowledge</h1>
+            <a href="https://youtube.com/@blackknowledge_190" target="_blank" class="text-red-500 text-2xl hover:scale-110 transition">
+                <i class="fab fa-youtube"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="custom-card p-8 rounded-3xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-link text-2xl text-blue-400"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold">Shorten Your Link</h2>
+                <p class="text-gray-400 text-sm mt-1">Ek dum fast aur secure link generator</p>
             </div>
-        </div>
-        <div class="flex gap-4 text-gray-500">
-            <i class="fas fa-search"></i>
-            <i class="fas fa-sliders-h"></i>
-        </div>
-    </div>
 
-    <div class="px-6">
-        <div class="blue-gradient-card p-6 relative overflow-hidden text-white">
-            <h2 class="text-2xl font-bold w-1/2">URL Shortener Tool</h2>
-            <p class="text-blue-100 text-xs mt-2">100% Secure & Fast</p>
-            <div class="mt-6 space-y-3">
-                <input type="url" id="longUrl" placeholder="Paste link here..." class="custom-input">
-                <button onclick="shortenURL()" id="shortBtn" class="bg-white text-blue-600 w-full py-3 rounded-xl font-bold shadow-lg transition active:scale-95">
-                    Shorten Link
+            <div class="space-y-4">
+                <input type="url" id="longUrl" placeholder="https://example.com" 
+                    class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-700 focus:border-blue-500 outline-none transition text-white">
+                
+                <button onclick="shortenURL()" id="shortenBtn" 
+                    class="w-full btn-gradient py-4 rounded-2xl font-bold text-lg hover:opacity-90 active:scale-95 transition shadow-lg">
+                    Shorten Now
                 </button>
             </div>
-            <img src="https://img.icons8.com/3d-fluency/94/link.png" class="absolute -right-2 -bottom-2 w-28 opacity-40">
-        </div>
-    </div>
 
-    <div class="px-6 mt-8">
-        <div class="flex justify-between items-center mb-4">
-            <h4 class="font-bold text-gray-800">Your Result</h4>
-            <span class="text-xs text-gray-400">See all</span>
-        </div>
-        <div id="resultBox" class="progress-container p-4 flex items-center gap-4 hidden">
-            <div class="bg-black/20 w-12 h-12 rounded-xl flex items-center justify-center font-bold">BK</div>
-            <div class="flex-grow overflow-hidden">
-                <p id="shortLink" class="text-sm font-bold truncate">Link ready...</p>
-                <div class="w-full bg-white/20 h-1.5 rounded-full mt-2">
-                    <div class="bg-white w-full h-full rounded-full animate-pulse"></div>
+            <div id="resultBox" class="mt-8 hidden animate-in">
+                <div class="p-5 bg-gray-800 rounded-2xl border-2 border-dashed border-blue-500/40 text-center">
+                    <p class="text-xs font-bold text-blue-400 uppercase mb-3">Chota Link Taiyar Hai:</p>
+                    <div id="shortLink" class="text-lg font-mono bg-black/30 p-3 rounded-lg mb-4 break-all"></div>
+                    
+                    <button id="copyBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold transition mb-4">
+                        <i class="fas fa-copy mr-2"></i> Copy Link
+                    </button>
+
+                    <div class="bg-white p-3 rounded-xl inline-block">
+                        <img id="qrCode" src="" alt="QR" class="w-28 h-28">
+                    </div>
                 </div>
             </div>
-            <button onclick="copyLink()" class="bg-white text-purple-600 px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap">Copy</button>
         </div>
-        <p id="placeholderText" class="text-gray-400 text-xs italic">No links generated yet.</p>
-    </div>
+    </main>
 
-    <div class="px-6 mt-8">
-        <h4 class="font-bold text-gray-800 mb-4">Extra Tools</h4>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="feature-card-red p-5 relative">
-                <i class="fas fa-qrcode mb-4 bg-black/10 p-2 rounded-lg"></i>
-                <h5 class="font-bold text-sm">QR Code</h5>
-                <p class="text-[10px] mt-1">⭐ 5.0</p>
-            </div>
-            <div class="feature-card-pink p-5 relative">
-                <i class="fas fa-shield-alt mb-4 bg-black/10 p-2 rounded-lg"></i>
-                <h5 class="font-bold text-sm">Secure</h5>
-                <p class="text-[10px] mt-1">⭐ 4.9</p>
-            </div>
-        </div>
-    </div>
+    <footer class="p-4 text-center text-gray-500 text-sm border-t border-gray-900">
+        Build with ❤️ by <span class="text-blue-500">Black Knowledge</span>
+    </footer>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active"><i class="fas fa-home"></i></div>
-        <div class="nav-item text-gray-400"><i class="fas fa-shopping-bag"></i></div>
-        <div class="nav-item text-gray-400"><i class="fas fa-heart"></i></div>
-        <div class="nav-item text-gray-400"><i class="fas fa-clipboard-list"></i></div>
-    </nav>
-</div>
+    <script>
+        async function shortenURL() {
+            const input = document.getElementById('longUrl');
+            const btn = document.getElementById('shortenBtn');
+            let url = input.value.trim();
 
-<script>
-    async function shortenURL() {
-        const input = document.getElementById('longUrl');
-        const resBox = document.getElementById('resultBox');
-        const placeholder = document.getElementById('placeholderText');
-        const shortDisplay = document.getElementById('shortLink');
-        
-        let url = input.value.trim();
-        if(!url) return Swal.fire('Error', 'Link toh daalo bhai!', 'error');
-        if(!url.startsWith('http')) url = 'https://' + url;
+            if(!url) return Swal.fire('Error', 'URL toh daalo bhai!', 'error');
+            if(!url.startsWith('http')) url = 'https://' + url;
 
-        Swal.fire({
-            title: 'Processing...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
+            btn.innerText = "Processing...";
+            btn.disabled = true;
 
-        try {
-            // Priority 1: TinyURL (More stable)
-            const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
-            const shortUrl = await res.text();
-
-            if (shortUrl && shortUrl.startsWith('http')) {
-                displayResult(shortUrl);
-                Swal.close();
-            } else {
-                throw new Error("Failed");
-            }
-        } catch (e) {
-            // Priority 2: Is.gd Fallback
             try {
-                const res2 = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
-                const data2 = await res2.json();
-                if (data2.shorturl) {
-                    displayResult(data2.shorturl);
-                    Swal.close();
+                // Is.gd API (CORS friendly)
+                const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+
+                if(data.shorturl) {
+                    display(data.shorturl);
                 } else {
-                    throw new Error("Failed");
+                    // Fallback
+                    const res2 = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+                    const short = await res2.text();
+                    display(short);
                 }
-            } catch (err) {
-                Swal.fire('Oops!', 'Server busy hai, baad mein try karein.', 'error');
+            } catch (e) {
+                Swal.fire('Oops', 'Internet check karein!', 'error');
+            } finally {
+                btn.innerText = "Shorten Now";
+                btn.disabled = false;
             }
         }
-    }
 
-    function displayResult(url) {
-        document.getElementById('resultBox').classList.remove('hidden');
-        document.getElementById('placeholderText').classList.add('hidden');
-        document.getElementById('shortLink').innerText = url;
-    }
-
-    function copyLink() {
-        const text = document.getElementById('shortLink').innerText;
-        navigator.clipboard.writeText(text);
-        Swal.fire({ title: 'Copied!', icon: 'success', timer: 1000, showConfirmButton: false, toast: true, position: 'top-end' });
-    }
-</script>
-
+        function display(shortUrl) {
+            document.getElementById('resultBox').classList.remove('hidden');
+            document.getElementById('shortLink').innerText = shortUrl;
+            document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${shortUrl}`;
+            
+            document.getElementById('copyBtn').onclick = () => {
+                const el = document.createElement('textarea');
+                el.value = shortUrl;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                Swal.fire({ title: 'Copied!', icon: 'success', timer: 1000, showConfirmButton: false });
+            };
+        }
+    </script>
 </body>
 </html>
