@@ -1,39 +1,39 @@
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
 
-// Bot Token: GitHub par daalne ke baad Vercel Settings mein 'BOT_TOKEN' add karein
-const BOT_TOKEN = process.env.BOT_TOKEN; 
+// Aapka Token yahan set hai
+const BOT_TOKEN = '8788584544:AAG-9N97opno83x3hwYIdYkZ3cJTRT9SRcM'; 
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 const DB_FILE = 'users_data.json';
 
-// Helper function: Data load karna
+// Data load function
 function loadData() {
     if (!fs.existsSync(DB_FILE)) return {};
     try {
-        return JSON.parse(fs.readFileSync(DB_FILE));
+        const content = fs.readFileSync(DB_FILE);
+        return JSON.parse(content);
     } catch (e) {
         return {};
     }
 }
 
-// Helper function: Data save karna
+// Data save function
 function saveData(data) {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
 }
 
-// /start command
 bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, 
-    `🔥 *FLOW GUILD BOT* 🔥\n\n` +
+    `🔥 *FLOW GUILD BOT LIVE* 🔥\n\n` +
+    `Hello ${msg.from.first_name || 'Owner'},\n\n` +
     `Commands:\n` +
-    `1️⃣ /add_guild <ID> - Apni Guild ID set karein\n` +
-    `2️⃣ /my_guild - Apni set ki hui ID dekhein\n` +
-    `3️⃣ /glory - Guild ki status check karein`, 
+    `1️⃣ /add_guild <ID> - Guild ID save karein\n` +
+    `2️⃣ /my_guild - Apni ID check karein\n` +
+    `3️⃣ /glory - Check Guild Status`, 
     { parse_mode: 'Markdown' });
 });
 
-// /add_guild <ID> command
 bot.onText(/\/add_guild (.+)/, (msg, match) => {
     const chatId = msg.chat.id;
     const guildId = match[1];
@@ -41,7 +41,7 @@ bot.onText(/\/add_guild (.+)/, (msg, match) => {
 
     data[chatId] = {
         guild_id: guildId,
-        username: msg.from.username || "Unknown",
+        username: msg.from.username || "User",
         added_on: new Date().toLocaleString()
     };
 
@@ -49,19 +49,17 @@ bot.onText(/\/add_guild (.+)/, (msg, match) => {
     bot.sendMessage(chatId, `✅ *Success!* Guild ID \`${guildId}\` save ho gayi hai.`, { parse_mode: 'Markdown' });
 });
 
-// /my_guild command
 bot.onText(/\/my_guild/, (msg) => {
     const chatId = msg.chat.id;
     let data = loadData();
 
     if (data[chatId]) {
-        bot.sendMessage(chatId, `🏆 Aapki Guild ID: \`${data[chatId].guild_id}\``, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `🏆 Aapki ID: \`${data[chatId].guild_id}\``, { parse_mode: 'Markdown' });
     } else {
-        bot.sendMessage(chatId, `❌ Aapne koi Guild add nahi ki. /add_guild use karein.`);
+        bot.sendMessage(chatId, `❌ Koi Guild set nahi hai. /add_guild use karein.`);
     }
 });
 
-// /glory command (Current Logic: Shows local info)
 bot.onText(/\/glory/, (msg) => {
     const chatId = msg.chat.id;
     let data = loadData();
@@ -70,7 +68,7 @@ bot.onText(/\/glory/, (msg) => {
         return bot.sendMessage(chatId, "❌ Pehle /add_guild karein.");
     }
 
-    bot.sendMessage(chatId, `🔍 Fetching data for Guild ID: ${data[chatId].guild_id}...\n\n(Note: Connect your Python API for real-time glory)`);
+    bot.sendMessage(chatId, `🔍 *Guild Info* 🔍\n\nID: \`${data[chatId].guild_id}\`\nStatus: Online\nGlory: Fetching...`, { parse_mode: 'Markdown' });
 });
 
-console.log("Bot is running...");
+console.log("FLOW Bot is running...");
