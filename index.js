@@ -1,74 +1,57 @@
+cat <<EOF > index.js
 const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
 const fs = require('fs');
 
-// Aapka Token yahan set hai
-const BOT_TOKEN = '8788584544:AAG-9N97opno83x3hwYIdYkZ3cJTRT9SRcM'; 
-
+const BOT_TOKEN = '8788584544:AAG-9N97opno83x3hwYIdYkZ3cJTRT9SRcM';
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-const DB_FILE = 'users_data.json';
 
-// Data load function
-function loadData() {
-    if (!fs.existsSync(DB_FILE)) return {};
+// Token fetch karne ka logic (Code se nikala gaya)
+async function getLiveToken() {
     try {
-        const content = fs.readFileSync(DB_FILE);
-        return JSON.parse(content);
-    } catch (e) {
-        return {};
-    }
-}
-
-// Data save function
-function saveData(data) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+        const r = await axios.get('https://tokens-asfufvfshnfkhvbb.francecentral-01.azurewebsites.net/ReQuesT?&type=ToKens');
+        const text = r.data;
+        const match = text.match(/ToKens : \[(.*?)\]/);
+        if (match) {
+            const tokens = match[1].replace(/['"\s]/g, '').split(',');
+            return tokens[Math.floor(Math.random() * tokens.length)];
+        }
+    } catch (e) { return null; }
 }
 
 bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(msg.chat.id, 
-    `🔥 *FLOW GUILD BOT LIVE* 🔥\n\n` +
-    `Hello ${msg.from.first_name || 'Owner'},\n\n` +
-    `Commands:\n` +
-    `1️⃣ /add_guild <ID> - Guild ID save karein\n` +
-    `2️⃣ /my_guild - Apni ID check karein\n` +
-    `3️⃣ /glory - Check Guild Status`, 
-    { parse_mode: 'Markdown' });
+    bot.sendMessage(msg.chat.id, "🎯 *FLOW PHANTOM V2 ONLINE*\n\nCommands:\n/info <UID> - Get Full Player/Guild Data\n/glory <UID> - Check Glory Status", { parse_mode: 'Markdown' });
 });
 
-bot.onText(/\/add_guild (.+)/, (msg, match) => {
+bot.onText(/\/info (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
-    const guildId = match[1];
-    let data = loadData();
+    const uid = match[1];
+    bot.sendMessage(chatId, "🔍 Player Data Fetch ho raha hai...");
 
-    data[chatId] = {
-        guild_id: guildId,
-        username: msg.from.username || "User",
-        added_on: new Date().toLocaleString()
-    };
+    const liveToken = await getLiveToken();
+    if (!liveToken) return bot.sendMessage(chatId, "❌ Server Busy: Token nahi mila.");
 
-    saveData(data);
-    bot.sendMessage(chatId, `✅ *Success!* Guild ID \`${guildId}\` save ho gayi hai.`, { parse_mode: 'Markdown' });
-});
+    // Note: C4 logic encryption use karta hai, yahan hum unke API bridge ko hit karenge
+    try {
+        const response = await axios.get(\`https://tokens-asfufvfshnfkhvbb.francecentral-01.azurewebsites.net/ReQuesT?id=\${uid}&type=likes\`);
+        const data = response.data;
+        
+        // Data format clean karna (Regex use karke)
+        const name = data.match(/PLayer NamE\s*:\s*(.*)/)?.[1] || "Unknown";
+        const server = data.match(/PLayer SerVer\s*:\s*(.*)/)?.[1] || "Unknown";
+        const likes = data.match(/LiKes After\s*:\s*(\d+)/)?.[1] || "0";
 
-bot.onText(/\/my_guild/, (msg) => {
-    const chatId = msg.chat.id;
-    let data = loadData();
-
-    if (data[chatId]) {
-        bot.sendMessage(chatId, `🏆 Aapki ID: \`${data[chatId].guild_id}\``, { parse_mode: 'Markdown' });
-    } else {
-        bot.sendMessage(chatId, `❌ Koi Guild set nahi hai. /add_guild use karein.`);
+        let reply = "👤 *PLAYER PROFILE*\n\n";
+        reply += "📝 Name: " + name + "\n";
+        reply += "🆔 UID: " + uid + "\n";
+        reply += "🌍 Server: " + server + "\n";
+        reply += "❤️ Total Likes: " + likes + "\n";
+        
+        bot.sendMessage(chatId, reply, { parse_mode: 'Markdown' });
+    } catch (err) {
+        bot.sendMessage(chatId, "❌ Error: ID galat hai ya server down hai.");
     }
 });
 
-bot.onText(/\/glory/, (msg) => {
-    const chatId = msg.chat.id;
-    let data = loadData();
-
-    if (!data[chatId]) {
-        return bot.sendMessage(chatId, "❌ Pehle /add_guild karein.");
-    }
-
-    bot.sendMessage(chatId, `🔍 *Guild Info* 🔍\n\nID: \`${data[chatId].guild_id}\`\nStatus: Online\nGlory: Fetching...`, { parse_mode: 'Markdown' });
-});
-
-console.log("FLOW Bot is running...");
+console.log("FLOW PHANTOM BOT V2 IS READY!");
+EOF
