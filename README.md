@@ -1,7 +1,8 @@
-# FF Multi-Guild Telegram Bot
-Created by: **FLOW OWNER**
+# FLOW GUILD BOT
+Multi-user Free Fire Guild Information Bot.
 
-## How to use:
-1. Set `BOT_TOKEN` in Environment Variables.
-2. Run `npm install` and `npm start`.
-3. Commands: `/add_guild`, `/my_guild`, `/glory`.
+## Commands
+- `/start`
+- `/add_guild <ID>`
+- `/my_guild`
+- `/glory`
